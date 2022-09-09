@@ -72,9 +72,20 @@ export function activate(context: vscode.ExtensionContext) {
                 });
             }
 
-            // Focus terminal and change working directory to lab folder
-            await vscode.commands.executeCommand('workbench.action.terminal.focus');
-            vscode.window.activeTerminal.sendText(`cd ${fileUri['path']} && clear`);
+            // Close all text editors and open files for users
+            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+            const filesToOpen = configFile['vscode']['starterFiles'];
+            filesToOpen.forEach((file: string) => {
+                const fileURL = `${fileUri['path']}/${file}`;
+                vscode.window.showTextDocument(vscode.Uri.file(fileURL));
+            });
+
+            // // Focus terminal and change working directory to lab folder
+            setTimeout(() => {
+                vscode.window.terminals.forEach((each) => { each.dispose(); });
+                vscode.window.createTerminal('bash', 'bash', ['--login'],).show();
+                vscode.window.activeTerminal.sendText(`cd ${fileUri['path']} && clear`);
+            }, 500);
 
             // Parse and render README.md
             const engine = new Liquid();
