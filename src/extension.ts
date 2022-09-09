@@ -197,35 +197,6 @@ export function activate(context: vscode.ExtensionContext) {
         return htmlString;
     }
 
-    function parserSpoiler(tagToken, remainTokens) {
-        this.tpls = [];
-        this.args = tagToken.args;
-
-        // Parse spoiler summary (default to "Spoiler")
-        this.summary = this.args.replaceAll('"', "").trim();
-        if (this.summary == '') {
-            this.summary = 'Spoiler';
-        }
-
-        let closed = false;
-        while(remainTokens.length) {
-            const token = remainTokens.shift();
-
-            // we got the end tag! stop taking tokens
-            if (token.getText() === '{% endspoiler %}') {
-                closed = true;
-                break;
-            }
-
-            // parse token into template
-            // parseToken() may consume more than 1 tokens
-            // e.g. {% if %}...{% endif %}
-            const tpl = this.liquid.parser.parseToken(token, remainTokens);
-            this.tpls.push(tpl);
-        }
-        if (!closed) throw new Error(`tag ${tagToken.getText()} not closed`);
-    }
-
     function initWebview(fileUri: vscode.Uri) {
         if (webViewGlobal == undefined) {
             vscode.commands.executeCommand('cs50-lab.focus');
