@@ -1,0 +1,106 @@
+{
+  "name": "cs50-lab",
+  "displayName": "CS50 Lab",
+  "description": "",
+  "version": "0.0.1",
+  "publisher": "CS50",
+  "repository": "https://github.com/cs50/lab50.vsix",
+  "engines": {
+    "vscode": "^1.71.0"
+  },
+  "categories": [
+    "Education"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cs50-lab.openAsLab",
+        "title": "Open Problem Set",
+        "icon": "$(notebook-open-as-text)"
+      },
+      {
+        "command": "cs50-lab.reloadLab",
+        "title": "Reload Lab",
+        "icon": "$(extensions-sync-enabled)"
+      },
+      {
+        "command": "cs50-lab.closeLab",
+        "title": "Close Lab",
+        "icon": "$(panel-close)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "cs50-lab.openAsLab",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation@0"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "cs50-lab.reloadLab",
+          "group": "navigation@0",
+          "when": "view == cs50-lab"
+        },
+        {
+          "command": "cs50-lab.closeLab",
+          "group": "navigation@1",
+          "when": "view == cs50-lab"
+        }
+      ]
+    },
+    "views": {
+      "cs50-lab": [
+        {
+          "id": "cs50-lab",
+          "name": "CS50 Lab",
+          "type": "webview"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cs50-lab",
+          "title": "CS50 Lab",
+          "icon": "$(notebook-open-as-text)"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/markdown-it": "^12.2.3",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.71.0",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "@vscode/test-electron": "^2.1.3",
+    "eslint": "^8.16.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "typescript": "^4.7.2"
+  },
+  "dependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "html-entities": "^2.3.3",
+    "js-yaml": "^4.1.0",
+    "liquidjs": "^9.39.1",
+    "markdown-it": "^13.0.1",
+    "pretty": "^2.0.0"
+  }
+}

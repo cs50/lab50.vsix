@@ -1,0 +1,4 @@
+vscode:
+  slug: "cs50/labs/2022/x/mario/less"
+  filesToUpdate: ["README.md"]
+  starterFiles: ["mario.c"]
