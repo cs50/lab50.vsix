@@ -18,7 +18,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     let webViewGlobal : vscode.WebviewView;         // Global reference to a webview
     let currentLabFolderUri : any;                  // Current opened lab folder
-    let saveOpenedTextEditors : any;                // Saved text editors before lab is opened
     let labDidOpen = false;                         // Current state of the lab
 
     // Register CS50 Lab WebView view provider
@@ -72,17 +71,6 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                 });
             }
-
-            // Backup current opened text editors
-            if (!labDidOpen) {
-                saveOpenedTextEditors = vscode.window.visibleTextEditors;
-            }
-            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-            const filesToOpen = configFile['vscode']['starterFiles'];
-            filesToOpen.forEach((file: string) => {
-                const fileURL = `${fileUri['path']}/${file}`;
-                vscode.window.showTextDocument(vscode.Uri.file(fileURL));
-            });
 
             // Focus terminal and change working directory to lab folder
             await vscode.commands.executeCommand('workbench.action.terminal.focus');
@@ -230,19 +218,19 @@ export function activate(context: vscode.ExtensionContext) {
     // Command: Close Lab
     context.subscriptions.push(
         vscode.commands.registerCommand('cs50-lab.closeLab', async () => {
-            saveOpenedTextEditors.forEach(async (editor, index)=> {
-                await vscode.window.showTextDocument(
-                    vscode.Uri.file(editor['document']['uri']['path']),
-                    { viewColumn: index + 1 }
-                );
-            });
+
+            // Close all text editors
+            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
+            // Focus file explorer
             await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
-            await vscode.commands.executeCommand('workbench.action.terminal.focus');
-            vscode.window.activeTerminal!.sendText(`cd ${vscode.workspace.workspaceFolders![0]['uri']['path']} && clear`);
+
+            // Force create terminal with login profile
+            vscode.window.terminals.forEach((each) => { each.dispose(); });
+            vscode.window.createTerminal('bash', 'bash', ['--login']).show();
 
             // Reset global variables
             webViewGlobal.webview.html = "Please open a lab.";
-            saveOpenedTextEditors = undefined;
             labDidOpen = false;
         })
     );
