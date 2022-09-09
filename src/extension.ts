@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    async function labViewHandler(fileUri: any) {
+    async function labViewHandler(fileUri: any, forceUpdate=true) {
 
         initWebview(fileUri);
         currentLabFolderUri = fileUri;
@@ -58,17 +58,20 @@ export function activate(context: vscode.ExtensionContext) {
             // Handle the scenario where lab source is not reachable or timeout
             // perhaps try downloading files to tmp folder first then move it back
             // to user's workspace
-            const filesToUpdate = configFile['vscode']['filesToUpdate'];
-            filesToUpdate.forEach((file: string) => {
-                const fileURL = `${fileUri['path']}/${file}`;
-                const command = `wget ${githubRawURL}/${file} -O ${fileURL}`;
-                try {
-                    const stdout = execSync(command, {timeout: 5000}).toString();
-                    console.log(stdout);
-                } catch (e) {
-                    console.log(e);
-                }
-            });
+
+            if (forceUpdate) {
+                const filesToUpdate = configFile['vscode']['filesToUpdate'];
+                filesToUpdate.forEach((file: string) => {
+                    const fileURL = `${fileUri['path']}/${file}`;
+                    const command = `wget ${githubRawURL}/${file} -O ${fileURL}`;
+                    try {
+                        const stdout = execSync(command, {timeout: 5000}).toString();
+                        console.log(stdout);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            }
 
             // Backup current opened text editors
             if (!labDidOpen) {
@@ -220,7 +223,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Command: Reset Lab View
     context.subscriptions.push(
         vscode.commands.registerCommand('cs50-lab.resetLayout', () => {
-            labViewHandler(currentLabFolderUri);
+            labViewHandler(currentLabFolderUri, false);
         })
     );
 
