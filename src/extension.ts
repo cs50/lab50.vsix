@@ -248,7 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Command: Reset Lab View
     context.subscriptions.push(
-        vscode.commands.registerCommand('cs50-lab.reloadLab', () => {
+        vscode.commands.registerCommand('cs50-lab.resetLayout', () => {
             labViewHandler(currentLabFolderUri);
         })
     );

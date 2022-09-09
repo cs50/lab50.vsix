@@ -23,9 +23,9 @@
         "icon": "$(notebook-open-as-text)"
       },
       {
-        "command": "cs50-lab.reloadLab",
-        "title": "Reload Lab",
-        "icon": "$(extensions-sync-enabled)"
+        "command": "cs50-lab.resetLayout",
+        "title": "Reset Layout",
+        "icon": "$(layout-panel-right)"
       },
       {
         "command": "cs50-lab.closeLab",
@@ -43,7 +43,7 @@
       ],
       "view/title": [
         {
-          "command": "cs50-lab.reloadLab",
+          "command": "cs50-lab.resetLayout",
           "group": "navigation@0",
           "when": "view == cs50-lab"
         },
