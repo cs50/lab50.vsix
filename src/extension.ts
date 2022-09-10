@@ -12,13 +12,12 @@ import MarkdownIt = require('markdown-it');
 export function activate(context: vscode.ExtensionContext) {
 
 	const CONFIG_FILE_NAME = '.cs50.yml';           // Default config yml file name
-    const LAB_WEBVIEW_SCRIPT = 'lab_script.js';     // Script
-    const LAB_WEBVIEW_STYLESHEET = 'lab_style.css'; // Styleshet
+    const LAB_WEBVIEW_SCRIPT = 'lab50.js';     // Script
+    const LAB_WEBVIEW_STYLESHEET = 'lab50.css'; // Styleshet
     const STATIC_FOLDER = 'static';                 // Statics
 
     let webViewGlobal : vscode.WebviewView;         // Global reference to a webview
     let currentLabFolderUri : any;                  // Current opened lab folder
-    let labDidOpen = false;                         // Current state of the lab
 
     // Register CS50 Lab WebView view provider
     vscode.window.registerWebviewViewProvider('lab50', {
@@ -172,7 +171,6 @@ export function activate(context: vscode.ExtensionContext) {
 
                 // Focus labview
                 await vscode.commands.executeCommand('lab50.focus');
-                labDidOpen = true;
             });
         } else {
             vscode.window.showWarningMessage(`Unable to locate ${CONFIG_FILE_NAME}`);
@@ -187,8 +185,6 @@ export function activate(context: vscode.ExtensionContext) {
                 <meta charset="utf-8">
                 <base href="${base}">
                 <link href="${styleUri}" rel="stylesheet">
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
                 <script src="${scriptUri}"></script>
             </head>
             <body>
@@ -242,7 +238,6 @@ export function activate(context: vscode.ExtensionContext) {
 
             // Reset global variables
             webViewGlobal.webview.html = "Please open a lab.";
-            labDidOpen = false;
         })
     );
 
