@@ -14,26 +14,28 @@ export function liquidEngine() {
         },
         render: async function(ctx) {
 
-            const locale = 'en';
             let html = "invalid datetime";
 
             // Default options
-            const opts = {
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                month: 'long',
-                timeZoneName: 'short',
-                weekday: 'long',
-                year: 'numeric'
-            }
+            const locale = 'en';
+            const tz = 'America/New_York'; // enforce EST/EDT timezone for now
 
             // Case 1: one argument, a quoted date and time in YYYY-MM-DD HH:MM format
             if (this.args.length == 2) {
                 const date = this.args[0];
                 const time = this.args[1];
                 const timeString = `${date}T${time}`;
-                const start = luxon.DateTime.fromISO(timeString).setLocale('en');
+                const start = luxon.DateTime.fromISO(timeString, {zone: tz}).setLocale('en');
+                const opts = {
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    month: 'long',
+                    timeZoneName: 'short',
+                    weekday: 'long',
+                    year: 'numeric'
+                }
+
                 html = start.toLocaleString(opts);
             }
 
@@ -41,7 +43,7 @@ export function liquidEngine() {
             if (this.args.length == 3) {
                 const date = this.args[0];
                 const startTime = this.args[1];
-                const start = luxon.DateTime.fromISO(`${date}T${startTime}`).setLocale('en');
+                const start = luxon.DateTime.fromISO(`${date}T${startTime}`, {zone: tz}).setLocale('en');
                 const startOpts = {
                     day: 'numeric',
                     hour: 'numeric',
@@ -58,6 +60,7 @@ export function liquidEngine() {
                     minute: 'numeric',
                     timeZoneName: 'short'
                 }
+
                 html = `${start.toLocaleString(startOpts)} - ${end.toLocaleString(endOpts)}`;
             }
 
@@ -66,10 +69,10 @@ export function liquidEngine() {
 
                 const startDate = this.args[0];
                 const startTime = this.args[1];
-                const start = luxon.DateTime.fromISO(`${startDate}T${startTime}`).setLocale('en');
+                const start = luxon.DateTime.fromISO(`${startDate}T${startTime}`, {zone: tz}).setLocale('en');
                 const endDate = this.args[2];
                 const endTime = this.args[3];
-                const end = luxon.DateTime.fromISO(`${endDate}T${endTime}`);
+                const end = luxon.DateTime.fromISO(`${endDate}T${endTime}`, {zone: tz});
 
                 const opts = {
                     day: 'numeric',
@@ -95,22 +98,20 @@ export function liquidEngine() {
 
                 else {
 
-                // Format end without date
-                html = start.toLocaleString(opts) + ' – ' + end.toLocaleString({
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    month: 'long',
-                    timeZoneName: 'short',
-                    weekday: 'long',
-                    year: 'numeric'
-                });
-
+                    // Format end with date
+                    html = start.toLocaleString(opts) + ' – ' + end.toLocaleString({
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        month: 'long',
+                        timeZoneName: 'short',
+                        weekday: 'long',
+                        year: 'numeric'
+                    });
                 }
             }
 
-            const htmlString = html;
-            return htmlString;
+            return html;
         }
     });
 
