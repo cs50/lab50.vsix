@@ -1,9 +1,118 @@
 import { Liquid } from 'liquidjs';
+import * as luxon from "luxon";
 
 export function liquidEngine() {
 
     // Parse and render README.md
     const engine = new Liquid();
+
+    // Register a local tag
+    engine.registerTag('local', {
+        parse: function(tagToken) {
+            this.args = tagToken.args.replaceAll('"', '').trim().split(' ');
+            console.log(this.args);
+        },
+        render: async function(ctx) {
+
+            const locale = 'en';
+            let html = "invalid datetime";
+
+            // Default options
+            const opts = {
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                month: 'long',
+                timeZoneName: 'short',
+                weekday: 'long',
+                year: 'numeric'
+            }
+
+            // Case 1: one argument, a quoted date and time in YYYY-MM-DD HH:MM format
+            if (this.args.length == 2) {
+                const date = this.args[0];
+                const time = this.args[1];
+                const timeString = `${date}T${time}`;
+                const start = luxon.DateTime.fromISO(timeString).setLocale('en');
+                html = start.toLocaleString(opts);
+            }
+
+            // Case 2: two arguments, a quoted start date and time in YYYY-MM-DD HH:MM format followed by a quoted end time in HH:MM format, provided that the end time is within 24 hours of the start time
+            if (this.args.length == 3) {
+                const date = this.args[0];
+                const startTime = this.args[1];
+                const start = luxon.DateTime.fromISO(`${date}T${startTime}`).setLocale('en');
+                const startOpts = {
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    month: 'long',
+                    weekday: 'long',
+                    year: 'numeric'
+                }
+
+                const endTime = this.args[2];
+                const end = luxon.DateTime.fromISO(`${endTime}`);
+                const endOpts = {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    timeZoneName: 'short'
+                }
+                html = `${start.toLocaleString(startOpts)} - ${end.toLocaleString(endOpts)}`;
+            }
+
+            // Case 3: two arguments, a quoted start date and time in YYYY-MM-DD HH:MM format followed by a quoted end date and time in YYYY-MM-DD HH:MM format
+            if (this.args.length == 4) {
+
+                const startDate = this.args[0];
+                const startTime = this.args[1];
+                const start = luxon.DateTime.fromISO(`${startDate}T${startTime}`).setLocale('en');
+                const endDate = this.args[2];
+                const endTime = this.args[3];
+                const end = luxon.DateTime.fromISO(`${endDate}T${endTime}`);
+
+                const opts = {
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    month: 'long',
+                    weekday: 'long',
+                    year: 'numeric'
+                }
+
+                if (locale === 'en' && (
+                    start.toLocaleString(luxon.DateTime.DATE_SHORT) === end.toLocaleString(luxon.DateTime.DATE_SHORT) ||
+                    end.toLocaleString(luxon.DateTime.TIME_24_WITH_SECONDS) === '24:00:00' &&
+                        start.toLocaleString(luxon.DateTime.DATE_SHORT) == end.minus({days: 1}).toLocaleString(luxon.DateTime.DATE_SHORT))) {
+
+                    // Format end without date
+                    html = start.toLocaleString(opts) + ' – ' + end.toLocaleString({
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        timeZoneName: 'short'
+                    });
+                }
+
+                else {
+
+                // Format end without date
+                html = start.toLocaleString(opts) + ' – ' + end.toLocaleString({
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    month: 'long',
+                    timeZoneName: 'short',
+                    weekday: 'long',
+                    year: 'numeric'
+                });
+
+                }
+            }
+
+            const htmlString = html;
+            return htmlString;
+        }
+    });
 
     // Register a next tag
     engine.registerTag('next', {
