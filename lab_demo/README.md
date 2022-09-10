@@ -1,7 +1,9 @@
 ---
 files:
   - mario.c
-url: https://github.com/cs50/lab50.vsix/blob/main/lab_demo/README.md
+url: https://raw.githubusercontent.com/cs50/lab50.vsix/main/lab_demo/README.md
+window:
+  - terminal
 ---
 
 # Mario
