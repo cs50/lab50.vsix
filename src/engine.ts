@@ -10,11 +10,11 @@ export function liquidEngine() {
     engine.registerTag('local', {
         parse: function(tagToken) {
             this.args = tagToken.args.replaceAll('"', '').trim().split(' ');
-            console.log(this.args);
         },
         render: async function(ctx) {
 
             let html = "invalid datetime";
+            let local;
 
             // Default options
             const locale = 'en';
@@ -37,6 +37,7 @@ export function liquidEngine() {
                 }
 
                 html = start.toLocaleString(opts);
+                local = `${start}`;
             }
 
             // Case 2: two arguments, a quoted start date and time in YYYY-MM-DD HH:MM format followed by a quoted end time in HH:MM format, provided that the end time is within 24 hours of the start time
@@ -62,6 +63,7 @@ export function liquidEngine() {
                 }
 
                 html = `${start.toLocaleString(startOpts)} - ${end.toLocaleString(endOpts)}`;
+                local = `${start}/${end}`;
             }
 
             // Case 3: two arguments, a quoted start date and time in YYYY-MM-DD HH:MM format followed by a quoted end date and time in YYYY-MM-DD HH:MM format
@@ -94,6 +96,7 @@ export function liquidEngine() {
                         minute: 'numeric',
                         timeZoneName: 'short'
                     });
+                    local = `${start}/${end}`;
                 }
 
                 else {
@@ -108,9 +111,13 @@ export function liquidEngine() {
                         weekday: 'long',
                         year: 'numeric'
                     });
+                    local = `${start}/${end}`;
                 }
             }
 
+            const clock = `<a data-clock href="https://time.cs50.io/${local}"><i class="far fa-clock" title="CS50 Time Converter"></i></a>`;
+
+            html = `<span>${html} clock: ${clock}</span>`;
             return html;
         }
     });

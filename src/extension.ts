@@ -104,12 +104,17 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     function htmlTemplate(base, scriptUri, styleUri, html) {
+
+        const fontawesomeUri = webViewGlobal.webview.asWebviewUri(
+            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/fontawesome/css`, 'all.min.css'));
+
         const htmlString =
         `<!DOCTYPE html>
         <html>
             <head>
                 <meta charset="utf-8">
                 <base href="${base}">
+                <link href="${fontawesomeUri}" rel="stylesheet">
                 <link href="${styleUri}" rel="stylesheet">
                 <script src="${scriptUri}"></script>
             </head>
