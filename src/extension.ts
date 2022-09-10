@@ -142,7 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
                 },
                 * render(context, emitter) {
                 emitter.write(`<details class='spoiler'>`);
-                emitter.write(`<summary>${this.summary}</summary>`);
+                emitter.write(`<summary style="cursor: pointer;">${this.summary}</summary>`);
                 yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
                 emitter.write("</details>");
                 }
