@@ -102,6 +102,7 @@
     "js-yaml": "^4.1.0",
     "liquidjs": "^9.39.1",
     "markdown-it": "^13.0.1",
+    "markdown-it-attrs": "^4.1.4",
     "pretty": "^2.0.0"
   }
 }

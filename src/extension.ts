@@ -6,6 +6,7 @@ import { execSync } from 'child_process';
 import { decode } from 'html-entities';
 import { Liquid } from 'liquidjs';
 import MarkdownIt = require('markdown-it');
+import markdownItAttrs = require('markdown-it-attrs');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -154,6 +155,10 @@ export function activate(context: vscode.ExtensionContext) {
             engine.parseAndRender(markdown).then(async parsedMarkdown => {
 
                 const md = new MarkdownIt();
+                md.use(markdownItAttrs, {
+                    leftDelimiter: "{:"
+                });
+
                 const parsedHtml = md.render(parsedMarkdown);
                 const decodedHtml = decode(parsedHtml);
 
