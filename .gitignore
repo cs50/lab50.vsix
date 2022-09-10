@@ -1,3 +1,14 @@
-node_modules
-out
+.*
+!.cs50.yml
+!/.github/
+!/.eslintrc.js
+!/.vscodeignore
+!.gitignore
+!/.vscode
+!/.vscode/launch.json
+!/.vscode/tasks.json
 *.vsix
+*.DS_Store
+out
+node_modules/
+__pycache__/
