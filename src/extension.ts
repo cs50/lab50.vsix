@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import { execSync } from 'child_process';
 import { decode } from 'html-entities';
-import { Liquid } from 'liquidjs';
+import { liquidEngine } from './engine';
 import MarkdownIt = require('markdown-it');
 import markdownItAttrs = require('markdown-it-attrs');
 
@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 
-        initWebview(fileUri);
+        await initWebview(fileUri);
         currentLabFolderUri = fileUri;
 
         // Inspect folder structure and look for configuration file
@@ -45,21 +45,13 @@ export function activate(context: vscode.ExtensionContext) {
             const result = extractYaml(configFilePath);
             if (result == undefined) {
                 await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
+                vscode.window.showWarningMessage('Invalid YAML front matter from README.md');
                 return;
             }
 
             const yamlConfig = result[0];
             const markdown = result[1];
-
-            // Generate GitHub raw base url
             const githubRawURL = yamlConfig['url'];
-
-            // Get a list of files that we wish to update
-            //
-            // TODO:
-            // Handle the scenario where lab source is not reachable or timeout
-            // perhaps try downloading files to tmp folder first then move it back
-            // to user's workspace
 
             if (forceUpdate) {
                 const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
@@ -72,91 +64,17 @@ export function activate(context: vscode.ExtensionContext) {
                 }
             }
 
-            // Close all text editors and open files for users
-            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-            const filesToOpen = yamlConfig['files'];
-            filesToOpen.forEach((file: string) => {
-                const fileURL = `${fileUri['path']}/${file}`;
-                vscode.window.showTextDocument(vscode.Uri.file(fileURL));
-            });
-
-            // // Focus terminal and change working directory to lab folder
-            setTimeout(() => {
-                vscode.window.terminals.forEach((each) => { each.dispose(); });
-                vscode.window.createTerminal('bash', 'bash', ['--login'],).show();
-                vscode.window.activeTerminal.sendText(`cd ${fileUri['path']} && clear`);
-            }, 500);
-
-            // Parse and render README.md
-            const engine = new Liquid();
-
-            // Register a next tag
-            engine.registerTag('next', {
-                render: async function(ctx) {
-                    const htmlString = `<button class="btn btn-success" data-next type="button">Next</button>`;
-                    return htmlString.trim();
-                }
-            });
-
-            // Register a video tag
-            engine.registerTag('video', {
-                parse: function(tagToken) {
-                    this.url = tagToken.args.replaceAll('"', "").trim();
-                },
-                render: async function() {
-                    const ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url)}`;
-                    const htmlString = `<div class="ratio ratio-16x9"><iframe sandbox="allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation allow-presentation" width="560" height="315" src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-
-                    return htmlString.trim();
-                }
-            });
-
-            // Register a spoiler tag (ends with endspoiler)
-            engine.registerTag('spoiler', {
-                parse: function(tagToken, remainTokens) {
-                    this.tpls = [];
-                    this.args = tagToken.args;
-
-                    // Parse spoiler summary (default to "Spoiler")
-                    this.summary = this.args.replaceAll('"', "").trim();
-                    if (this.summary == '') {
-                        this.summary = 'Spoiler';
-                    }
-
-                    let closed = false;
-                    while(remainTokens.length) {
-                        const token = remainTokens.shift();
-
-                        // we got the end tag! stop taking tokens
-                        if (token.getText() === '{% endspoiler %}') {
-                            closed = true;
-                            break;
-                        }
-
-                        // parse token into template
-                        // parseToken() may consume more than 1 tokens
-                        // e.g. {% if %}...{% endif %}
-                        const tpl = this.liquid.parser.parseToken(token, remainTokens);
-                        this.tpls.push(tpl);
-                    }
-                    if (!closed) throw new Error(`tag ${tagToken.getText()} not closed`);
-                },
-                * render(context, emitter) {
-                emitter.write(`<details class='spoiler'>`);
-                emitter.write(`<summary style="cursor: pointer;">${this.summary}</summary>`);
-                yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
-                emitter.write("</details>");
-                }
-            });
+            // Prepare layout
+            prepareLayout(fileUri, yamlConfig);
 
             // Have liquidJS make the first pass to convert all tags to html equivalents
+            const engine = liquidEngine();
             engine.parseAndRender(markdown).then(async parsedMarkdown => {
 
                 const md = new MarkdownIt();
                 md.use(markdownItAttrs, {
                     leftDelimiter: "{:"
                 });
-
                 const parsedHtml = md.render(parsedMarkdown);
                 const decodedHtml = decode(parsedHtml);
 
@@ -220,6 +138,30 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }
 
+    async function prepareLayout(fileUri, yamlConfig) {
+        await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+        const filesToOpen = yamlConfig['files'];
+        filesToOpen.forEach((file: string) => {
+            const fileURL = `${fileUri['path']}/${file}`;
+            vscode.window.showTextDocument(vscode.Uri.file(fileURL));
+        });
+
+        // Change working directory to lab folder
+        setTimeout(() => {
+            resetTerminal(`cd ${fileUri['path']} && clear`);
+        }, 500);
+    }
+
+    function resetTerminal(cmd=undefined) {
+        const newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
+        vscode.window.terminals.forEach((each) => {
+            if (each.processId != newTerm.processId) {
+                each.dispose();
+            }
+        });
+        if (cmd) { newTerm.sendText(cmd); }
+    }
+
     function validate(yamlConfig) {
         let isValid = true;
         let cmdProvided = false;
@@ -249,19 +191,11 @@ export function activate(context: vscode.ExtensionContext) {
         return isValid;
     }
 
-    function initWebview(fileUri: vscode.Uri) {
+    async function initWebview(fileUri: vscode.Uri) {
         if (webViewGlobal == undefined) {
             vscode.commands.executeCommand('lab50.focus');
-            setTimeout(() => {labViewHandler(fileUri);}, 500);
-            return;
+            await new Promise(f => setTimeout(f, 500));
         }
-    }
-
-    // Helper function to parse youtube id from url
-    function yt_parser(url: string){
-        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match&&match[7].length==11)? match[7] : false;
     }
 
     function getPosition(string, subString, index) {
@@ -291,8 +225,7 @@ export function activate(context: vscode.ExtensionContext) {
             await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
 
             // Force create terminal with login profile
-            vscode.window.terminals.forEach((each) => { each.dispose(); });
-            vscode.window.createTerminal('bash', 'bash', ['--login']).show();
+            resetTerminal();
 
             // Reset global variables
             webViewGlobal.webview.html = "Please open a lab.";
