@@ -1,3 +1,9 @@
+---
+files:
+  - mario.c
+url: https://github.com/cs50/lab50.vsix/blob/main/lab_demo/README.md
+---
+
 # Mario
 
 ## World 1-1
