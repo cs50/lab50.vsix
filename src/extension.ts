@@ -35,6 +35,12 @@ export function activate(context: vscode.ExtensionContext) {
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 
+        await vscode.commands.executeCommand(
+            "setContext",
+            "lab50:showReadme",
+            true
+          );
+
         await initWebview(fileUri);
         currentLabFolderUri = fileUri;
 
@@ -224,11 +230,18 @@ export function activate(context: vscode.ExtensionContext) {
             // Focus file explorer
             await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
 
+            // Update context
+            await vscode.commands.executeCommand(
+                "setContext",
+                "lab50:showReadme",
+                false
+              );
+
             // Force create terminal with login profile
             resetTerminal();
 
             // Reset global variables
-            webViewGlobal.webview.html = "Please open a lab.";
+            webViewGlobal = undefined;
         })
     );
 }

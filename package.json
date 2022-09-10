@@ -55,8 +55,7 @@
         },
         {
           "command": "lab50.closeLab",
-          "group": "navigation@1",
-          "when": "view == lab50"
+          "group": "navigation@1"
         }
       ]
     },
@@ -65,7 +64,8 @@
         {
           "id": "lab50",
           "name": "CS50 Lab",
-          "type": "webview"
+          "type": "webview",
+          "when": "lab50:showReadme"
         }
       ]
     },
