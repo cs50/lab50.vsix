@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
     let labDidOpen = false;                         // Current state of the lab
 
     // Register CS50 Lab WebView view provider
-    vscode.window.registerWebviewViewProvider('cs50-lab', {
+    vscode.window.registerWebviewViewProvider('lab50', {
         resolveWebviewView: (webView) => {
             const workspaceFolder = vscode.workspace.workspaceFolders![0];
             webView.webview.options = {
@@ -171,7 +171,7 @@ export function activate(context: vscode.ExtensionContext) {
                 webViewGlobal.webview.html = htmlTemplate(base, scriptUri, styleUri, decodedHtml);
 
                 // Focus labview
-                await vscode.commands.executeCommand('cs50-lab.focus');
+                await vscode.commands.executeCommand('lab50.focus');
                 labDidOpen = true;
             });
         } else {
@@ -201,7 +201,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     function initWebview(fileUri: vscode.Uri) {
         if (webViewGlobal == undefined) {
-            vscode.commands.executeCommand('cs50-lab.focus');
+            vscode.commands.executeCommand('lab50.focus');
             setTimeout(() => {labViewHandler(fileUri);}, 500);
             return;
         }
@@ -216,19 +216,19 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Command: Open Folder as CS50 Lab
     context.subscriptions.push(
-        vscode.commands.registerCommand('cs50-lab.openAsLab', labViewHandler)
+        vscode.commands.registerCommand('lab50.openAsLab', labViewHandler)
     );
 
     // Command: Reset Lab View
     context.subscriptions.push(
-        vscode.commands.registerCommand('cs50-lab.resetLayout', () => {
+        vscode.commands.registerCommand('lab50.resetLayout', () => {
             labViewHandler(currentLabFolderUri, false);
         })
     );
 
     // Command: Close Lab
     context.subscriptions.push(
-        vscode.commands.registerCommand('cs50-lab.closeLab', async () => {
+        vscode.commands.registerCommand('lab50.closeLab', async () => {
 
             // Close all text editors
             await vscode.commands.executeCommand('workbench.action.closeAllEditors');

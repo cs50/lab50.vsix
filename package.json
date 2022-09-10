@@ -1,6 +1,6 @@
 {
-  "name": "cs50-lab",
-  "displayName": "CS50 Lab",
+  "name": "lab50",
+  "displayName": "Lab50",
   "description": "",
   "version": "0.0.1",
   "publisher": "CS50",
@@ -18,17 +18,17 @@
   "contributes": {
     "commands": [
       {
-        "command": "cs50-lab.openAsLab",
-        "title": "Open Problem Set",
+        "command": "lab50.openAsLab",
+        "title": "Open in CS50 Lab",
         "icon": "$(notebook-open-as-text)"
       },
       {
-        "command": "cs50-lab.resetLayout",
+        "command": "lab50.resetLayout",
         "title": "Reset Layout",
         "icon": "$(layout-panel-right)"
       },
       {
-        "command": "cs50-lab.closeLab",
+        "command": "lab50.closeLab",
         "title": "Close Lab",
         "icon": "$(panel-close)"
       }
@@ -36,28 +36,28 @@
     "menus": {
       "explorer/context": [
         {
-          "command": "cs50-lab.openAsLab",
+          "command": "lab50.openAsLab",
           "when": "explorerResourceIsFolder",
           "group": "navigation@0"
         }
       ],
       "view/title": [
         {
-          "command": "cs50-lab.resetLayout",
+          "command": "lab50.resetLayout",
           "group": "navigation@0",
-          "when": "view == cs50-lab"
+          "when": "view == lab50"
         },
         {
-          "command": "cs50-lab.closeLab",
+          "command": "lab50.closeLab",
           "group": "navigation@1",
-          "when": "view == cs50-lab"
+          "when": "view == lab50"
         }
       ]
     },
     "views": {
-      "cs50-lab": [
+      "lab50": [
         {
-          "id": "cs50-lab",
+          "id": "lab50",
           "name": "CS50 Lab",
           "type": "webview"
         }
@@ -66,7 +66,7 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "cs50-lab",
+          "id": "lab50",
           "title": "CS50 Lab",
           "icon": "$(notebook-open-as-text)"
         }
