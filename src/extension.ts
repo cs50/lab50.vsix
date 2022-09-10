@@ -12,9 +12,9 @@ import markdownItAttrs = require('markdown-it-attrs');
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	const CONFIG_FILE_NAME = '.cs50.yml';           // Default config yml file name
-    const LAB_WEBVIEW_SCRIPT = 'lab50.js';     // Script
-    const LAB_WEBVIEW_STYLESHEET = 'lab50.css'; // Styleshet
+	const CONFIG_FILE_NAME = 'README.md';           // Default config yml file name
+    const LAB_WEBVIEW_SCRIPT = 'lab50.js';          // Script
+    const LAB_WEBVIEW_STYLESHEET = 'lab50.css';     // Styleshet
     const STATIC_FOLDER = 'static';                 // Statics
 
     let webViewGlobal : vscode.WebviewView;         // Global reference to a webview
@@ -42,14 +42,17 @@ export function activate(context: vscode.ExtensionContext) {
         const configFilePath = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
         if (fs.existsSync(configFilePath)) {
 
-            // Load config file
-            const configFile = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+            const result = extractYaml(configFilePath);
+            if (result == undefined) {
+                await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
+                return;
+            }
 
-            // Read slug
-            const slug = configFile['vscode']['slug'];
+            const yamlConfig = result[0];
+            const markdown = result[1];
 
             // Generate GitHub raw base url
-            const githubRawURL = `https://raw.githubusercontent.com/${slug}`;
+            const githubRawURL = yamlConfig['url'];
 
             // Get a list of files that we wish to update
             //
@@ -59,22 +62,19 @@ export function activate(context: vscode.ExtensionContext) {
             // to user's workspace
 
             if (forceUpdate) {
-                const filesToUpdate = configFile['vscode']['filesToUpdate'];
-                filesToUpdate.forEach((file: string) => {
-                    const fileURL = `${fileUri['path']}/${file}`;
-                    const command = `wget ${githubRawURL}/${file} -O ${fileURL}`;
-                    try {
-                        const stdout = execSync(command, {timeout: 5000}).toString();
-                        console.log(stdout);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                });
+                const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
+                const command = `wget ${githubRawURL} -O ${fileURL}`;
+                try {
+                    const stdout = execSync(command, {timeout: 5000}).toString();
+                    console.log(stdout);
+                } catch (e) {
+                    console.log(e);
+                }
             }
 
             // Close all text editors and open files for users
             await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-            const filesToOpen = configFile['vscode']['starterFiles'];
+            const filesToOpen = yamlConfig['files'];
             filesToOpen.forEach((file: string) => {
                 const fileURL = `${fileUri['path']}/${file}`;
                 vscode.window.showTextDocument(vscode.Uri.file(fileURL));
@@ -150,8 +150,6 @@ export function activate(context: vscode.ExtensionContext) {
             });
 
             // Have liquidJS make the first pass to convert all tags to html equivalents
-            const readmePath = `${fileUri['path']}/README.md`;
-            const markdown = fs.readFileSync(readmePath, {encoding: 'utf-8'});
             engine.parseAndRender(markdown).then(async parsedMarkdown => {
 
                 const md = new MarkdownIt();
@@ -168,7 +166,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const styleUri = webViewGlobal.webview.asWebviewUri(
                     vscode.Uri.joinPath(context.extension.extensionUri, STATIC_FOLDER, LAB_WEBVIEW_STYLESHEET));
 
-                const base = webViewGlobal.webview.asWebviewUri(vscode.Uri.file(readmePath));
+                const base = webViewGlobal.webview.asWebviewUri(vscode.Uri.file(configFilePath));
 
                 // Render webview
                 webViewGlobal.webview.html = htmlTemplate(base, scriptUri, styleUri, decodedHtml);
@@ -199,6 +197,58 @@ export function activate(context: vscode.ExtensionContext) {
         return htmlString;
     }
 
+    function extractYaml (configFilePath) {
+
+        // Extract YAML front matter from README.md
+        const readmeFile = fs.readFileSync(configFilePath, {encoding: 'utf-8'});
+        const divider = '---';
+        const yamlStart = getPosition(readmeFile, divider, 1);
+        const yamlEnd = getPosition(readmeFile, divider, 2);
+        const yamlFrontMatter = readmeFile.slice(yamlStart, yamlEnd);
+
+        try {
+            const yamlConfig: Object = yaml.load(yamlFrontMatter);
+            if (yamlConfig == undefined || !validate(yamlConfig)) {
+                return undefined;
+            }
+
+            const markdown = readmeFile.slice(yamlEnd + divider.length);
+            return [yamlConfig, markdown] as const;
+        } catch (error) {
+            console.log(error);
+            return undefined;
+        }
+    }
+
+    function validate(yamlConfig) {
+        let isValid = true;
+        let cmdProvided = false;
+        let filesProvided = false;
+        let portProvided = false;
+        let readmeProvided = false;
+        let windowProvided = false;
+        let browserProvided = false;
+        let terminalProvided = false;
+        let xProvided = false;
+
+        if ('cmd' in yamlConfig) { cmdProvided = true; }
+        if ('files' in yamlConfig) { filesProvided = true; }
+        if ('port' in yamlConfig) { portProvided = true; }
+        if ('readme' in yamlConfig) { readmeProvided = false; }
+        if ('window' in yamlConfig) {
+            windowProvided = true;
+            if (yamlConfig['window'].includes('browser')) { browserProvided = true; }
+            if (yamlConfig['window'].includes('terminal')) { terminalProvided = true; }
+            if (yamlConfig['window'].includes('x')) { xProvided = true; }
+        }
+
+        if (cmdProvided && !terminalProvided) { isValid = false; console.log(`violation: "cmd" provided but not "temrinal"`); }
+        if (browserProvided && xProvided) { isValid = false; console.log(`violation: "browser" and "x" cannot co-exist`); }
+        if (portProvided && !browserProvided) { isValid = false; console.log(`violation: "port" provided but not "browser"`); }
+
+        return isValid;
+    }
+
     function initWebview(fileUri: vscode.Uri) {
         if (webViewGlobal == undefined) {
             vscode.commands.executeCommand('lab50.focus');
@@ -212,6 +262,10 @@ export function activate(context: vscode.ExtensionContext) {
         const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
         const match = url.match(regExp);
         return (match&&match[7].length==11)? match[7] : false;
+    }
+
+    function getPosition(string, subString, index) {
+        return string.split(subString, index).join(subString).length;
     }
 
     // Command: Open Folder as CS50 Lab
@@ -244,9 +298,4 @@ export function activate(context: vscode.ExtensionContext) {
             webViewGlobal.webview.html = "Please open a lab.";
         })
     );
-
-
 }
-
-
-export function deactivate() {}
