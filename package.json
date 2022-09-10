@@ -34,11 +34,17 @@
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+            "command": "lab50.openAsLab",
+            "when": "false"
+        }
+      ],
       "explorer/context": [
         {
           "command": "lab50.openAsLab",
           "when": "explorerResourceIsFolder",
-          "group": "navigation@0"
+          "group": "2_workspace@0"
         }
       ],
       "view/title": [
