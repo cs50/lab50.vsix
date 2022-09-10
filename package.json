@@ -20,7 +20,7 @@
       {
         "command": "lab50.openAsLab",
         "title": "Open in CS50 Lab",
-        "icon": "$(notebook-open-as-text)"
+        "icon": "$(test-view-icon)"
       },
       {
         "command": "lab50.resetLayout",
@@ -68,7 +68,7 @@
         {
           "id": "lab50",
           "title": "CS50 Lab",
-          "icon": "$(notebook-open-as-text)"
+          "icon": "$(test-view-icon)"
         }
       ]
     }
