@@ -153,7 +153,6 @@ export function activate(context: vscode.ExtensionContext) {
             const markdown = fs.readFileSync(readmePath, {encoding: 'utf-8'});
             engine.parseAndRender(markdown).then(async parsedMarkdown => {
 
-                // Have MarkDoc re-parse everything
                 const md = new MarkdownIt();
                 const parsedHtml = md.render(parsedMarkdown);
                 const decodedHtml = decode(parsedHtml);
