@@ -14,19 +14,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function init() {
-    let nextBtns = document.querySelectorAll('[data-next]');
-    nextBtns.forEach((nextBtn) => {
-        nextBtn.addEventListener('click', handleNext);
-        nextBtn.removeAttribute('disabled');
-    });
 
-    // Hide all sibling elements beneath the first next button
-    let next = nextBtns[0].parentElement.nextElementSibling;
-    while (next != null) {
-        next.classList.add('next');
-        next.classList.add('fade-in');
-        next = next.nextElementSibling;
-    }
+    // handle next buttons
+    try {
+        let nextBtns = document.querySelectorAll('[data-next]');
+        nextBtns.forEach((nextBtn) => {
+            nextBtn.addEventListener('click', handleNext);
+            nextBtn.removeAttribute('disabled');
+        });
+
+        // Hide all sibling elements beneath the first next button
+        let next = nextBtns[0].parentElement.nextElementSibling;
+        while (next != null) {
+            next.classList.add('next');
+            next.classList.add('fade-in');
+            next = next.nextElementSibling;
+        }
+    } catch {}
+
+    // handle MathJax
+    try {
+        // override mjx-container style to inline
+        document.querySelectorAll('.MathJax').forEach((each) => {
+            each.style.display = "inline";
+        });
+    } catch {}
+
     document.body.style.minHeight = "auto";
     window.scrollTo(0, 0);
 }

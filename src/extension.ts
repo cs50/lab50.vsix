@@ -149,19 +149,25 @@ export async function activate(context: vscode.ExtensionContext) {
                 <base href="${base}">
                 <link href="${fontawesomeUri}" rel="stylesheet">
                 <link href="${styleUri}" rel="stylesheet">
-                <script src="${scriptUri}"></script>
+                <script>
+                    MathJax = {
+                    chtml: {
+                            displayAlign: "left"
+                        }
+                    };
+                </script>
+                <script crossorigin="anonymous" integrity="sha256-z47L98YXVhVIaY0uyDzt675P5Ea+w3RsPh9VD5NuoTY=" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"></script>
             </head>
             <body>
                 ${html}
             </body>
+            <script src="${scriptUri}"></script>
         </html>`.trim();
 
         return htmlString;
     }
 
     function extractYaml (configFilePath) {
-
-        console.log("called");
 
         // Extract YAML front matter from README.md
         const readmeFile = fs.readFileSync(configFilePath, {encoding: 'utf-8'});
