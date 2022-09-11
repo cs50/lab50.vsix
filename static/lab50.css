@@ -12,6 +12,11 @@ button {
 	background: var(--vscode-button-background);
 }
 
+button:disabled,
+button[disabled]{
+  background-color: var(--vscode-disabledForeground);
+}
+
 button:hover {
 	cursor: pointer;
 	background: var(--vscode-button-hoverBackground);
@@ -41,6 +46,10 @@ pre {
 
 .next {
     display: none;
+}
+
+.no-hover {
+    pointer-events: none;
 }
 
 /* https://stackoverflow.com/questions/11679567/using-css-for-a-fade-in-effect-on-page-load */

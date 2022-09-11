@@ -33,6 +33,7 @@ function init() {
 
 function handleNext(event) {
     event.target.setAttribute('disabled', 'true');
+    event.target.classList.add('no-hover');
 
     let next = event.target.parentElement.nextElementSibling;
     next.classList.remove('next');
