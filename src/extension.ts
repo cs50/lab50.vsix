@@ -35,13 +35,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 
-        await vscode.commands.executeCommand(
-            "setContext",
-            "lab50:showReadme",
-            true
-          );
-
-        await initWebview(fileUri);
         currentLabFolderUri = fileUri;
 
         // Inspect folder structure and look for configuration file
@@ -49,7 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (fs.existsSync(configFilePath)) {
 
             let markdown: string;
-            let yamlConfig: object;
+            let yamlConfig;
 
             // extract yaml configuration from README.md
             const result = extractYaml(configFilePath);
@@ -61,8 +54,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 return;
             }
 
-            // if yaml config was not present
-            if (result[0] == undefined) {
+            // if yaml config is empty
+            if (result[0] === '') {
                 markdown = result[1];
             } else {
                 yamlConfig = result[0];
@@ -70,40 +63,43 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             // attempt to update README.md
-            if (forceUpdate && yamlConfig) {
+            if (forceUpdate && yamlConfig != undefined) {
+                if ('url' in yamlConfig) {
+                    // attemp to download README.md file from repo
+                    try {
+                        const githubRawURL = yamlConfig['url'];
+                        const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
 
-                // attemp to download README.md file from repo
-                try {
-                    const githubRawURL = yamlConfig['url'];
-                    const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
+                        // authenticate request if on Codespaces
+                        let header = '';
+                        if (process.env['CODESPACES'] != undefined) {
+                            header = `--header "Accept: application/vnd.github.v3+json" --header "Authorization: token ${process.env['GITHUB_TOKEN']}"`;
+                        }
 
-                    // authenticate request if on Codespaces
-                    let header = '';
-                    if (process.env['CODESPACES'] != undefined) {
-                        header = `--header "Accept: application/vnd.github.v3+json" --header "Authorization: token ${process.env['GITHUB_TOKEN']}"`;
+                        // first download the file to "README.md.download", then replace
+                        // current "README.md" file only if curl command succeed
+                        const commands = [
+                            `curl ${githubRawURL} ${header} --fail --output ${fileURL}.download`,
+                            `mv -f ${fileURL}.download ${fileURL}`
+                        ];
+                        commands.forEach((command) => {
+                            execSync(command, {timeout: 5000}).toString();
+                        });
+
+                        // retrieve the latest markdown content
+                        markdown = extractYaml(configFilePath)[1];
+
+                    } catch (error) {
+                        console.log(error);
+                        vscode.window.showErrorMessage(
+                            `Failed to download README.md, exit status code: (${error.status})`);
+                        return;
                     }
-
-                    // first download the file to "README.md.download", then replace
-                    // current "README.md" file only if curl command succeed
-                    const commands = [
-                        `curl ${githubRawURL} ${header} --fail --output ${fileURL}.download`,
-                        `mv -f ${fileURL}.download ${fileURL}`
-                    ];
-                    commands.forEach((command) => {
-                        execSync(command, {timeout: 5000}).toString();
-                    });
-
-                    // retrieve the latest markdown content
-                    markdown = extractYaml(configFilePath)[1];
-
-                } catch (error) {
-                    vscode.window.showErrorMessage(
-                        `Failed to download README.md, exit status code: (${error.status})`);
                 }
             }
 
             // Prepare layout
-            prepareLayout(fileUri, yamlConfig);
+            await initWebview();
 
             // Have liquidJS make the first pass to convert all tags to html equivalents
             const engine = liquidEngine();
@@ -125,10 +121,9 @@ export async function activate(context: vscode.ExtensionContext) {
                 const base = webViewGlobal.webview.asWebviewUri(vscode.Uri.file(configFilePath));
 
                 // Render webview
-                webViewGlobal.webview.html = htmlTemplate(base, scriptUri, styleUri, decodedHtml);
+                const html = htmlTemplate(base, scriptUri, styleUri, decodedHtml);
+                await prepareLayout(fileUri, yamlConfig, html);
 
-                // Focus labview
-                await vscode.commands.executeCommand('lab50.focus');
             });
         } else {
             await vscode.commands.executeCommand(
@@ -166,6 +161,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     function extractYaml (configFilePath) {
 
+        console.log("called");
+
         // Extract YAML front matter from README.md
         const readmeFile = fs.readFileSync(configFilePath, {encoding: 'utf-8'});
         const divider = '---';
@@ -173,17 +170,21 @@ export async function activate(context: vscode.ExtensionContext) {
         const yamlEnd = getPosition(readmeFile, divider, 2);
         const yamlFrontMatter = readmeFile.slice(yamlStart, yamlEnd);
 
-        if (yamlFrontMatter.length === 0) {
-            return [undefined, readmeFile] as const;
-        }
-
+        let markdown;
         try {
-            const yamlConfig: Object = yaml.load(yamlFrontMatter);
+            const yamlConfig = yaml.load(yamlFrontMatter);
+
+            if (yamlConfig == null || yamlFrontMatter.length === 0) {
+                console.log("yaml config appears to be empty, render readme");
+                markdown = readmeFile;
+                return ['', markdown] as const;
+            }
+
             if (yamlConfig == undefined || !validate(yamlConfig)) {
                 return undefined;
             }
 
-            const markdown = readmeFile.slice(yamlEnd + divider.length);
+            markdown = readmeFile.slice(yamlEnd + divider.length);
             return [yamlConfig, markdown] as const;
         } catch (error) {
             console.log(error);
@@ -193,7 +194,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     function validate(yamlConfig) {
         let isValid = true;
-        let urlProvided = false;
         let cmdProvided = false;
         let filesProvided = false;
         let portProvided = false;
@@ -207,7 +207,6 @@ export async function activate(context: vscode.ExtensionContext) {
         if ('files' in yamlConfig) { filesProvided = true; }
         if ('port' in yamlConfig) { portProvided = true; }
         if ('readme' in yamlConfig) { readmeProvided = false; }
-        if ('url' in yamlConfig) { urlProvided = true; }
         if ('window' in yamlConfig) {
             windowProvided = true;
             if (yamlConfig['window'].includes('browser')) { browserProvided = true; }
@@ -215,7 +214,6 @@ export async function activate(context: vscode.ExtensionContext) {
             if (yamlConfig['window'].includes('x')) { xProvided = true; }
         }
 
-        if (!urlProvided) { isValid = false; console.log(`violation: "url" not provided`); }
         if (cmdProvided && !terminalProvided) { isValid = false; console.log(`violation: "cmd" provided but not "temrinal"`); }
         if (browserProvided && xProvided) { isValid = false; console.log(`violation: "browser" and "x" cannot co-exist`); }
         if (portProvided && !browserProvided) { isValid = false; console.log(`violation: "port" provided but not "browser"`); }
@@ -223,24 +221,31 @@ export async function activate(context: vscode.ExtensionContext) {
         return isValid;
     }
 
-    async function prepareLayout(fileUri, yamlConfig) {
+    async function prepareLayout(fileUri, yamlConfig, html) {
 
         // close all editors
         await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
         // open files for users, if any
-        if (yamlConfig != undefined) {
+        if (yamlConfig != undefined && yamlConfig != '') {
             const filesToOpen = yamlConfig['files'];
             filesToOpen.forEach((file: string) => {
                 const fileURL = `${fileUri['path']}/${file}`;
                 vscode.window.showTextDocument(vscode.Uri.file(fileURL));
             });
+        } else {
+            await vscode.commands.executeCommand('workbench.action.files.newUntitledFile');
         }
 
         // reset terminal, change working directory to lab folder
         setTimeout(async () => {
             await resetTerminal(`cd ${fileUri['path']} && clear`);
         }, 500);
+
+        webViewGlobal.webview.html = html;
+
+        // Focus labview
+        await vscode.commands.executeCommand('lab50.focus');
     }
 
     async function resetTerminal(cmd=undefined) {
@@ -254,9 +259,14 @@ export async function activate(context: vscode.ExtensionContext) {
         await vscode.commands.executeCommand('workbench.action.terminal.focus');
     }
 
-    async function initWebview(fileUri: vscode.Uri) {
-        if (webViewGlobal == undefined) {
-            vscode.commands.executeCommand('lab50.focus');
+    async function initWebview() {
+        if (webViewGlobal === undefined) {
+            await vscode.commands.executeCommand(
+                "setContext",
+                "lab50:showReadme",
+                true
+              );
+            await vscode.commands.executeCommand('lab50.focus');
             await new Promise(f => setTimeout(f, 500));
         }
     }
