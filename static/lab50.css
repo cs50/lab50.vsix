@@ -51,6 +51,10 @@ iframe {
     height: 100%;
 }
 
+summary {
+    margin-bottom: 0.5em;
+}
+
 * {
     word-break: break-word;
 }
