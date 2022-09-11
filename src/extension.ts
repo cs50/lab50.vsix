@@ -48,21 +48,33 @@ export function activate(context: vscode.ExtensionContext) {
         const configFilePath = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
         if (fs.existsSync(configFilePath)) {
 
+            let markdown: string;
+            let yamlConfig: object;
+
+            // extract yaml configuration from README.md
             const result = extractYaml(configFilePath);
+
+            // if yaml config was corrupted or invalid
             if (result == undefined) {
                 await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
                 vscode.window.showWarningMessage('Invalid YAML front matter from README.md');
                 return;
             }
 
-            const yamlConfig = result[0];
-            let markdown = result[1];
-            const githubRawURL = yamlConfig['url'];
+            // if yaml config was not present
+            if (result[0] == undefined) {
+                markdown = result[1];
+            } else {
+                yamlConfig = result[0];
+                markdown = result[1];
+            }
 
-            if (forceUpdate) {
+            // attempt to update README.md
+            if (forceUpdate && yamlConfig) {
 
                 // attemp to download README.md file from repo
                 try {
+                    const githubRawURL = yamlConfig['url'];
                     const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
 
                     // authenticate request if on Codespaces
@@ -83,6 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                     // retrieve the latest markdown content
                     markdown = extractYaml(configFilePath)[1];
+
                 } catch (error) {
                     vscode.window.showErrorMessage(
                         `Failed to download README.md, status code: (${error.status})`);
@@ -154,6 +167,10 @@ export function activate(context: vscode.ExtensionContext) {
         const yamlEnd = getPosition(readmeFile, divider, 2);
         const yamlFrontMatter = readmeFile.slice(yamlStart, yamlEnd);
 
+        if (yamlFrontMatter.length === 0) {
+            return [undefined, readmeFile] as const;
+        }
+
         try {
             const yamlConfig: Object = yaml.load(yamlFrontMatter);
             if (yamlConfig == undefined || !validate(yamlConfig)) {
@@ -166,30 +183,6 @@ export function activate(context: vscode.ExtensionContext) {
             console.log(error);
             return undefined;
         }
-    }
-
-    async function prepareLayout(fileUri, yamlConfig) {
-        await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-        const filesToOpen = yamlConfig['files'];
-        filesToOpen.forEach((file: string) => {
-            const fileURL = `${fileUri['path']}/${file}`;
-            vscode.window.showTextDocument(vscode.Uri.file(fileURL));
-        });
-
-        // Change working directory to lab folder
-        setTimeout(() => {
-            resetTerminal(`cd ${fileUri['path']} && clear`);
-        }, 500);
-    }
-
-    function resetTerminal(cmd=undefined) {
-        const newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
-        vscode.window.terminals.forEach((each) => {
-            if (each.processId != newTerm.processId) {
-                each.dispose();
-            }
-        });
-        if (cmd) { newTerm.sendText(cmd); }
     }
 
     function validate(yamlConfig) {
@@ -222,6 +215,36 @@ export function activate(context: vscode.ExtensionContext) {
         if (portProvided && !browserProvided) { isValid = false; console.log(`violation: "port" provided but not "browser"`); }
 
         return isValid;
+    }
+
+    async function prepareLayout(fileUri, yamlConfig) {
+
+        // close all editors
+        await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
+        // open files for users, if any
+        if (yamlConfig != undefined) {
+            const filesToOpen = yamlConfig['files'];
+            filesToOpen.forEach((file: string) => {
+                const fileURL = `${fileUri['path']}/${file}`;
+                vscode.window.showTextDocument(vscode.Uri.file(fileURL));
+            });
+        }
+
+        // reset terminal, change working directory to lab folder
+        setTimeout(() => {
+            resetTerminal(`cd ${fileUri['path']} && clear`);
+        }, 500);
+    }
+
+    function resetTerminal(cmd=undefined) {
+        const newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
+        vscode.window.terminals.forEach((each) => {
+            if (each.processId != newTerm.processId) {
+                each.dispose();
+            }
+        });
+        if (cmd) { newTerm.sendText(cmd); }
     }
 
     async function initWebview(fileUri: vscode.Uri) {
