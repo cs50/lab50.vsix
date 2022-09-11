@@ -232,12 +232,12 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         // reset terminal, change working directory to lab folder
-        setTimeout(() => {
-            resetTerminal(`cd ${fileUri['path']} && clear`);
+        setTimeout(async () => {
+            await resetTerminal(`cd ${fileUri['path']} && clear`);
         }, 500);
     }
 
-    function resetTerminal(cmd=undefined) {
+    async function resetTerminal(cmd=undefined) {
         const newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
         vscode.window.terminals.forEach((each) => {
             if (each.processId != newTerm.processId) {
@@ -245,6 +245,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         });
         if (cmd) { newTerm.sendText(cmd); }
+        await vscode.commands.executeCommand('workbench.action.terminal.focus');
     }
 
     async function initWebview(fileUri: vscode.Uri) {
@@ -275,18 +276,15 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('lab50.closeLab', async () => {
 
-            // Close all text editors
-            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-
-            // Focus file explorer
-            await vscode.commands.executeCommand('workbench.explorer.fileView.focus');
-
             // Update context
             await vscode.commands.executeCommand(
                 "setContext",
                 "lab50:showReadme",
                 false
               );
+
+            // Close all text editors
+            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
             // Force create terminal with login profile
             resetTerminal();
