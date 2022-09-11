@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             const yamlConfig = result[0];
-            const markdown = result[1];
+            let markdown = result[1];
             const githubRawURL = yamlConfig['url'];
 
             if (forceUpdate) {
@@ -75,11 +75,14 @@ export function activate(context: vscode.ExtensionContext) {
                     // current "README.md" file only if curl command succeed
                     const commands = [
                         `curl ${githubRawURL} ${header} --fail --output ${fileURL}.download`,
-                        `mv ${fileURL}.download ${fileURL}`
+                        `mv -f ${fileURL}.download ${fileURL}`
                     ];
                     commands.forEach((command) => {
                         execSync(command, {timeout: 5000}).toString();
                     });
+
+                    // retrieve the latest markdown content
+                    markdown = extractYaml(configFilePath)[1];
                 } catch (error) {
                     vscode.window.showErrorMessage(
                         `Failed to download README.md, status code: (${error.status})`);
@@ -191,6 +194,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     function validate(yamlConfig) {
         let isValid = true;
+        let urlProvided = false;
         let cmdProvided = false;
         let filesProvided = false;
         let portProvided = false;
@@ -204,6 +208,7 @@ export function activate(context: vscode.ExtensionContext) {
         if ('files' in yamlConfig) { filesProvided = true; }
         if ('port' in yamlConfig) { portProvided = true; }
         if ('readme' in yamlConfig) { readmeProvided = false; }
+        if ('url' in yamlConfig) { urlProvided = true; }
         if ('window' in yamlConfig) {
             windowProvided = true;
             if (yamlConfig['window'].includes('browser')) { browserProvided = true; }
@@ -211,6 +216,7 @@ export function activate(context: vscode.ExtensionContext) {
             if (yamlConfig['window'].includes('x')) { xProvided = true; }
         }
 
+        if (!urlProvided) { isValid = false; console.log(`violation: "url" not provided`); }
         if (cmdProvided && !terminalProvided) { isValid = false; console.log(`violation: "cmd" provided but not "temrinal"`); }
         if (browserProvided && xProvided) { isValid = false; console.log(`violation: "browser" and "x" cannot co-exist`); }
         if (portProvided && !browserProvided) { isValid = false; console.log(`violation: "port" provided but not "browser"`); }
