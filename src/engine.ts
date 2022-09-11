@@ -137,8 +137,7 @@ export function liquidEngine() {
         },
         render: async function() {
             const ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url)}`;
-            const htmlString = `<div class="ratio ratio-16x9"><iframe sandbox="allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation allow-presentation" width="560" height="315" src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-
+            const htmlString = `<div class="ratio ratio-16x9"><iframe src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe></div>`;
             return htmlString.trim();
         }
     });
