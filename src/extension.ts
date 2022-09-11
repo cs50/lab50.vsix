@@ -10,7 +10,7 @@ import markdownItAttrs = require('markdown-it-attrs');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
 	const CONFIG_FILE_NAME = 'README.md';           // Default config yml file name
     const LAB_WEBVIEW_SCRIPT = 'lab50.js';          // Script
@@ -299,4 +299,11 @@ export function activate(context: vscode.ExtensionContext) {
             webViewGlobal = undefined;
         })
     );
+
+
+    await vscode.commands.executeCommand(
+        "setContext",
+        "lab50:didActivateExtension",
+        true
+      );
 }
