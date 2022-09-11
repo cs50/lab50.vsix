@@ -18,14 +18,13 @@ export function liquidEngine() {
 
             // Default options
             const locale = 'en';
-            const tz = 'America/New_York'; // enforce EST/EDT timezone for now
 
             // Case 1: one argument, a quoted date and time in YYYY-MM-DD HH:MM format
             if (this.args.length == 2) {
                 const date = this.args[0];
                 const time = this.args[1];
                 const timeString = `${date}T${time}`;
-                const start = luxon.DateTime.fromISO(timeString, {zone: tz}).setLocale('en');
+                const start = luxon.DateTime.fromISO(timeString).setLocale('en');
                 const opts = {
                     day: 'numeric',
                     hour: 'numeric',
@@ -44,7 +43,7 @@ export function liquidEngine() {
             if (this.args.length == 3) {
                 const date = this.args[0];
                 const startTime = this.args[1];
-                const start = luxon.DateTime.fromISO(`${date}T${startTime}`, {zone: tz}).setLocale('en');
+                const start = luxon.DateTime.fromISO(`${date}T${startTime}`).setLocale('en');
                 const startOpts = {
                     day: 'numeric',
                     hour: 'numeric',
@@ -71,10 +70,10 @@ export function liquidEngine() {
 
                 const startDate = this.args[0];
                 const startTime = this.args[1];
-                const start = luxon.DateTime.fromISO(`${startDate}T${startTime}`, {zone: tz}).setLocale('en');
+                const start = luxon.DateTime.fromISO(`${startDate}T${startTime}`).setLocale('en');
                 const endDate = this.args[2];
                 const endTime = this.args[3];
-                const end = luxon.DateTime.fromISO(`${endDate}T${endTime}`, {zone: tz});
+                const end = luxon.DateTime.fromISO(`${endDate}T${endTime}`);
 
                 const opts = {
                     day: 'numeric',
