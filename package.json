@@ -55,7 +55,8 @@
         },
         {
           "command": "lab50.closeLab",
-          "group": "navigation@1"
+          "group": "navigation@1",
+          "when": "view == lab50"
         }
       ]
     },
