@@ -1,3 +1,5 @@
+/* https://code.visualstudio.com/api/references/theme-color */
+
 button {
 	border: none;
 	padding: 0.5em;
@@ -26,6 +28,15 @@ button.secondary {
 
 button.secondary:hover {
 	background: var(--vscode-button-secondaryHoverBackground);
+}
+
+code {
+    color: var(--vscode-editor-foreground);
+}
+
+pre {
+    background: var(--vscode-editor-background);
+    padding: 10px;
 }
 
 .next {
