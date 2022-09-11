@@ -1,7 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // https://stackoverflow.com/questions/56830928/calling-vscode-extension-for-data-from-webview
+
+    window.addEventListener('message', event => {
+        const message = event.data;
+        switch (message.command) {
+            case 'reload':
+                init();
+        }
+    });
+
+    init();
+});
+
+function init() {
     let nextBtns = document.querySelectorAll('[data-next]');
     nextBtns.forEach((nextBtn) => {
         nextBtn.addEventListener('click', handleNext);
+        nextBtn.removeAttribute('disabled');
     });
 
     // Hide all sibling elements beneath the first next button
@@ -11,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
         next.classList.add('fade-in');
         next = next.nextElementSibling;
     }
-});
+    document.body.style.minHeight = "auto";
+    window.scrollTo(0, 0);
+}
 
 function handleNext(event) {
     event.target.setAttribute('disabled', 'true');

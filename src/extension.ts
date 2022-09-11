@@ -60,13 +60,29 @@ export function activate(context: vscode.ExtensionContext) {
             const githubRawURL = yamlConfig['url'];
 
             if (forceUpdate) {
-                const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
-                const command = `wget ${githubRawURL} -O ${fileURL}`;
+
+                // attemp to download README.md file from repo
                 try {
-                    const stdout = execSync(command, {timeout: 5000}).toString();
-                    console.log(stdout);
-                } catch (e) {
-                    console.log(e);
+                    const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
+
+                    // authenticate request if on Codespaces
+                    let header = '';
+                    if (process.env['CODESPACES'] != undefined) {
+                        header = `--header "Accept: application/vnd.github.v3+json" --header "Authorization: token ${process.env['GITHUB_TOKEN']}"`;
+                    }
+
+                    // first download the file to "README.md.download", then replace
+                    // current "README.md" file only if curl command succeed
+                    const commands = [
+                        `curl ${githubRawURL} ${header} --fail --output ${fileURL}.download`,
+                        `mv ${fileURL}.download ${fileURL}`
+                    ];
+                    commands.forEach((command) => {
+                        execSync(command, {timeout: 5000}).toString();
+                    });
+                } catch (error) {
+                    vscode.window.showErrorMessage(
+                        `Failed to download README.md, status code: (${error.status})`);
                 }
             }
 
@@ -222,6 +238,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('lab50.resetLayout', () => {
             labViewHandler(currentLabFolderUri, false);
+            webViewGlobal.webview.postMessage({ command: 'reload'});
         })
     );
 
