@@ -3,7 +3,7 @@
   "displayName": "Lab50",
   "description": "https://cs50.readthedocs.io/lab/",
   "icon": "images/lab50.png",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "CS50",
   "repository": "https://github.com/cs50/lab50.vsix",
   "engines": {

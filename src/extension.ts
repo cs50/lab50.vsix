@@ -131,6 +131,12 @@ export function activate(context: vscode.ExtensionContext) {
                 await vscode.commands.executeCommand('lab50.focus');
             });
         } else {
+            await vscode.commands.executeCommand(
+                "setContext",
+                "lab50:showReadme",
+                false
+              );
+            webViewGlobal = undefined;
             vscode.window.showWarningMessage(`Unable to locate ${CONFIG_FILE_NAME}`);
         }
     }
