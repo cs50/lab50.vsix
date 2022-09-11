@@ -98,7 +98,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
                 } catch (error) {
                     vscode.window.showErrorMessage(
-                        `Failed to download README.md, status code: (${error.status})`);
+                        `Failed to download README.md, exit status code: (${error.status})`);
                 }
             }
 
