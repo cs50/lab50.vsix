@@ -17,8 +17,16 @@ export async function activate(context: vscode.ExtensionContext) {
     const LAB_WEBVIEW_STYLESHEET = 'lab50.css';     // Styleshet
     const STATIC_FOLDER = 'static';                 // Statics
 
-    let webViewGlobal : vscode.WebviewView;         // Global reference to a webview
-    let currentLabFolderPath : any;                  // Current opened lab folder
+    let webViewGlobal: vscode.WebviewView;         // Global reference to a webview
+    let currentLabFolderPath: any;                  // Current opened lab folder
+    let didOpenLab = false;
+
+    // Expose public facing API for other extensions to use (e.g., cs50.vsix)
+    const api = {
+        didOpenLab() {
+            return didOpenLab;
+        }
+      };
 
     // Default timeout to 10s for axios request
     axios.defaults.timeout = 10000;
@@ -170,6 +178,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 <base href="${base}">
                 <link href="${fontawesomeUri}" rel="stylesheet">
                 <link href="${styleUri}" rel="stylesheet">
+                <script src="https://asciinema.org/a/14.js" id="asciicast-14" async data-size="big"></script>
             </head>
             <body>
                 ${html}
@@ -181,7 +190,6 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
                 };
             </script>
-            <script src="https://asciinema.org/a/14.js" id="asciicast-14" async data-size="big"></script>
             <script crossorign="anonymous" src="${mathjaxUri}"></script>
             <script src="${scriptUri}"></script>
         </html>`.trim();
@@ -275,6 +283,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Focus labview
         await vscode.commands.executeCommand('lab50.focus');
+        didOpenLab = true;
     }
 
     async function resetTerminal(cmd=undefined) {
@@ -359,8 +368,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
             // Reset global variables
             webViewGlobal = undefined;
+            didOpenLab = false;
         })
     );
 
     await vscode.commands.executeCommand("setContext", "lab50:didActivateExtension", true);
+
+    // 'export' public api-surface
+    return api;
 }
