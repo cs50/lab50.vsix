@@ -268,7 +268,12 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     async function resetTerminal(cmd=undefined) {
-        const newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
+        let newTerm: vscode.Terminal;
+        if (process.env['CODESPACE']) {
+            newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
+        } else {
+            newTerm = vscode.window.createTerminal();
+        }
         vscode.window.terminals.forEach((each) => {
             if (each.processId != newTerm.processId) {
                 each.dispose();
