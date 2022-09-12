@@ -42,7 +42,7 @@ button.secondary:hover {
 
 code {
     color: var(--vscode-editor-foreground);
-    font-size: large;
+    font-size: 12pt;
     background: var(--vscode-editor-background);
     white-space : pre-wrap !important;
 }
