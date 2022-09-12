@@ -1,5 +1,10 @@
 /* https://code.visualstudio.com/api/references/theme-color */
 
+body {
+    line-height: 1.5;
+    font-size: medium;
+}
+
 button {
 	border: none;
 	padding: 0.5em;
@@ -37,12 +42,9 @@ button.secondary:hover {
 
 code {
     color: var(--vscode-editor-foreground);
-    white-space : pre-wrap !important;
-}
-
-pre {
+    font-size: large;
     background: var(--vscode-editor-background);
-    padding: 10px;
+    white-space : pre-wrap !important;
 }
 
 iframe {
@@ -51,8 +53,34 @@ iframe {
     height: 100%;
 }
 
+pre {
+    background: var(--vscode-editor-background);
+    padding: 10px;
+}
+
 summary {
     margin-bottom: 0.5em;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table th {
+    border-bottom: 1pt solid var(--vscode-editor-foreground)
+}
+
+tr {
+    border-bottom: 1px solid var(--vscode-editor-foreground);
+}
+
+tr:last-child
+{
+   border-bottom: none;
+}
+
+th, td {
+    padding: 5px;
 }
 
 * {
