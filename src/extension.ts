@@ -1,13 +1,13 @@
-
-import * as vscode from 'vscode';
+import axios from 'axios';
 import * as fs from 'fs';
+import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
-import { execSync } from 'child_process';
-import { decode } from 'html-entities';
-import { liquidEngine } from './engine';
 import MarkdownIt = require('markdown-it');
 import markdownItAttrs = require('markdown-it-attrs');
+import { decode } from 'html-entities';
+import { liquidEngine } from './engine';
 import { LabEditorProvider } from './editor';
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -81,29 +81,33 @@ export async function activate(context: vscode.ExtensionContext) {
                         const fileURL = `${currentLabFolderPath}/${CONFIG_FILE_NAME}`;
 
                         // authenticate request if on Codespaces
-                        let header = '';
+                        let headers = {};
                         if (process.env['CODESPACES'] != undefined) {
-                            header = `--header "Accept: application/vnd.github.v3+json" --header "Authorization: token ${process.env['GITHUB_TOKEN']}"`;
+                            headers = {
+                                headers: {
+                                    Accept: 'application/vnd.github.v3+json',
+                                    Authorization: `token ${process.env['GITHUB_TOKEN']}`
+                                }
+                            }
                         }
 
                         // first download the file to "README.md.download", then replace
                         // current "README.md" file only if curl command succeed
-                        const commands = [
-                            `curl ${githubRawURL} ${header} --fail --output ${fileURL}.download`,
-                            `mv -f ${fileURL}.download ${fileURL}`
-                        ];
-                        commands.forEach((command) => {
-                            execSync(command, {timeout: 5000}).toString();
-                        });
+                        const res = await axios.get(`${githubRawURL}`, headers);
+                        if (res.status === 200) {
+                            fs.writeFile(configFilePath, res.data, () => {
+                                console.log(`updated ${configFilePath}`);
 
-                        // retrieve the latest markdown content
-                        markdown = extractYaml(configFilePath)[1];
-
+                                // retrieve the latest markdown content
+                                markdown = extractYaml(configFilePath)[1];
+                            });
+                        } else {
+                            vscode.window.showErrorMessage(
+                                `Failed to download README.md. HTTP Status Code: ${res.status})`);
+                        }
                     } catch (error) {
                         console.log(error);
-                        vscode.window.showErrorMessage(
-                            `Failed to download README.md, exit status code: (${error.status})`);
-                        return;
+                        vscode.window.showErrorMessage(`${error}`);
                     }
                 }
             }
