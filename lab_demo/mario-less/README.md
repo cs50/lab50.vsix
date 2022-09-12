@@ -1,7 +1,7 @@
 ---
 files:
   - mario.c
-url: https://raw.githubusercontent.com/cs50/lab50.vsix/main/lab_demo/README.md
+url: https://raw.githubusercontent.com/cs50/lab50.vsix/main/lab_demo/mario-less/README.md
 window:
   - terminal
 ---
