@@ -302,7 +302,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Command: Reset Lab View
     context.subscriptions.push(
         vscode.commands.registerCommand('lab50.resetLayout', () => {
-            labViewHandler(currentLabFolderPath, false);
+            labViewHandler({path: currentLabFolderPath}, false);
             webViewGlobal.webview.postMessage({ command: 'reload'});
         })
     );
