@@ -7,6 +7,7 @@ import { decode } from 'html-entities';
 import { liquidEngine } from './engine';
 import MarkdownIt = require('markdown-it');
 import markdownItAttrs = require('markdown-it-attrs');
+import { LabEditorProvider } from './editor';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,6 +33,9 @@ export async function activate(context: vscode.ExtensionContext) {
             webViewGlobal = webView;
         }
     });
+
+    context.subscriptions.push(LabEditorProvider.register(context, labViewHandler));
+
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 

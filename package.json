@@ -35,6 +35,18 @@
         "icon": "$(panel-close)"
       }
     ],
+    "customEditors": [
+      {
+          "viewType": "lab50.editor",
+          "displayName": "CS50 Lab",
+          "selector": [
+              {
+                  "filenamePattern": "*.md"
+              }
+          ],
+          "priority": "default"
+      }
+    ],
     "menus": {
       "commandPalette": [
         {
