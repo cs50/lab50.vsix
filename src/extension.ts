@@ -141,6 +141,9 @@ export async function activate(context: vscode.ExtensionContext) {
         const fontawesomeUri = webViewGlobal.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/fontawesome/css`, 'all.min.css'));
 
+        const mathjaxUri = webViewGlobal.webview.asWebviewUri(
+            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/mathjax/js`, 'tex-chtml.js'));
+
         const htmlString =
         `<!DOCTYPE html>
         <html>
@@ -149,18 +152,18 @@ export async function activate(context: vscode.ExtensionContext) {
                 <base href="${base}">
                 <link href="${fontawesomeUri}" rel="stylesheet">
                 <link href="${styleUri}" rel="stylesheet">
-                <script>
-                    MathJax = {
-                    chtml: {
-                            displayAlign: "left"
-                        }
-                    };
-                </script>
-                <script crossorigin="anonymous" integrity="sha256-z47L98YXVhVIaY0uyDzt675P5Ea+w3RsPh9VD5NuoTY=" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"></script>
             </head>
             <body>
                 ${html}
             </body>
+            <script>
+                MathJax = {
+                chtml: {
+                        displayAlign: "left"
+                    }
+                };
+            </script>
+            <script crossorign="anonymous" src="${mathjaxUri}"></script>
             <script src="${scriptUri}"></script>
         </html>`.trim();
 
