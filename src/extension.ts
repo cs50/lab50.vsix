@@ -18,7 +18,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const STATIC_FOLDER = 'static';                 // Statics
 
     let webViewGlobal : vscode.WebviewView;         // Global reference to a webview
-    let currentLabFolderUri : any;                  // Current opened lab folder
+    let currentLabFolderPath : any;                  // Current opened lab folder
 
     // Register CS50 Lab WebView view provider
     vscode.window.registerWebviewViewProvider('lab50', {
@@ -35,10 +35,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 
-        currentLabFolderUri = fileUri;
+        // Determine lab folder path
+        currentLabFolderPath = fileUri['path'];
+        if (currentLabFolderPath.includes('.md')) {
+
+            // If user clicks on a README.md file, derive its parent folder path
+            currentLabFolderPath = currentLabFolderPath.substring(0, currentLabFolderPath.lastIndexOf('/'));
+        }
 
         // Inspect folder structure and look for configuration file
-        const configFilePath = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
+        const configFilePath = `${currentLabFolderPath}/${CONFIG_FILE_NAME}`;
         if (fs.existsSync(configFilePath)) {
 
             let markdown: string;
@@ -68,7 +74,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     // attemp to download README.md file from repo
                     try {
                         const githubRawURL = yamlConfig['url'];
-                        const fileURL = `${fileUri['path']}/${CONFIG_FILE_NAME}`;
+                        const fileURL = `${currentLabFolderPath}/${CONFIG_FILE_NAME}`;
 
                         // authenticate request if on Codespaces
                         let header = '';
@@ -122,7 +128,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
                 // Render webview
                 const html = htmlTemplate(base, scriptUri, styleUri, decodedHtml);
-                await prepareLayout(fileUri, yamlConfig, html);
+                await prepareLayout(yamlConfig, html);
 
             });
         } else {
@@ -230,7 +236,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return isValid;
     }
 
-    async function prepareLayout(fileUri, yamlConfig, html) {
+    async function prepareLayout(yamlConfig, html) {
 
         // close all editors
         await vscode.commands.executeCommand('workbench.action.closeAllEditors');
@@ -239,7 +245,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (yamlConfig != undefined && yamlConfig != '') {
             const filesToOpen = yamlConfig['files'];
             filesToOpen.forEach((file: string) => {
-                const fileURL = `${fileUri['path']}/${file}`;
+                const fileURL = `${currentLabFolderPath}/${file}`;
                 vscode.window.showTextDocument(vscode.Uri.file(fileURL));
             });
         } else {
@@ -248,7 +254,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // reset terminal, change working directory to lab folder
         setTimeout(async () => {
-            await resetTerminal(`cd ${fileUri['path']} && clear`);
+            await resetTerminal(`cd ${currentLabFolderPath} && clear`);
         }, 500);
 
         webViewGlobal.webview.html = html;
@@ -292,7 +298,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Command: Reset Lab View
     context.subscriptions.push(
         vscode.commands.registerCommand('lab50.resetLayout', () => {
-            labViewHandler(currentLabFolderUri, false);
+            labViewHandler(currentLabFolderPath, false);
             webViewGlobal.webview.postMessage({ command: 'reload'});
         })
     );
