@@ -1,6 +1,6 @@
 ---
 files: [caesar.c]
-url: https://raw.githubusercontent.com/classroom50/2022-fall-caesar/main/README.md
+url: https://cdn.cs50.net/2022/fall/psets/2/caesar/README.md
 window: [terminal]
 ---
 
@@ -14,58 +14,6 @@ plaintext:  HELLO
 ciphertext: URYYB
 ```
 
-## Getting Started
-
-Open [VS Code](https://code.cs50.io/).
-
-Start by clicking inside your terminal window, then execute `cd` by itself. You should find that its "prompt" resembles the below.
-
-```
-$
-```
-
-Click inside of that terminal window and then execute
-
-```
-wget https://cdn.cs50.net/2021/fall/psets/2/caesar.zip
-```
-
-followed by Enter in order to download a ZIP called `caesar.zip` in your codespace. Take care not to overlook the space between `wget` and the following URL, or any other character for that matter!
-
-Now execute
-
-```
-unzip caesar.zip
-```
-
-to create a folder called `caesar`. You no longer need the ZIP file, so you can execute
-
-```
-rm caesar.zip
-```
-
-and respond with "y" followed by Enter at the prompt to remove the ZIP file you downloaded.
-
-Now type
-
-```
-cd caesar
-```
-
-followed by Enter to move yourself into (i.e., open) that directory. Your prompt should now resemble the below.
-
-```
-caesar/ $
-```
-
-If all was successful, you should execute
-
-```
-ls
-```
-
-and see a file named `caesar.c`. Executing `code caesar.c` should open the file where you will type your code for this problem set. If not, retrace your steps and see if you can determine where you went wrong!
-
 ## Background
 
 Supposedly, Caesar (yes, that Caesar) used to "encrypt" (i.e., conceal in a reversible way) confidential messages by shifting each letter therein by some number of places. For instance, he might write A as B, B as C, C as D, ..., and, wrapping around alphabetically, Z as A. And so, to say HELLO to someone, Caesar might write IFMMP instead. Upon receiving such messages from Caesar, recipients would have to "decrypt" them by shifting letters in the opposite direction by the same number of places.
@@ -78,7 +26,7 @@ To be clear, then, here's how encrypting `HELLO` with a key of $$1$$ yields `IFM
 
 | plaintext    | `H` | `E` | `L` | `L` | `O` |
 |--------------|---|---|---|---|---|
-| + key        | 1 | 1 | 1 | 1 | 1 |
+| + key        | $$1$$ | $$1$$ | $$1$$ | $$1$$ | $$1$$ |
 | = ciphertext | `I` | `F` | `M` | `M` | `P` |
 
 More formally, Caesar's algorithm (i.e., cipher) encrypts messages by "rotating" each letter by $$k$$ positions. More formally, if $$p$$ is some plaintext (i.e., an unencrypted message), $$p_i$$ is the $$i^{th}$$ character in $$p$$, and $$k$$ is a secret key (i.e., a non-negative integer), then each letter, $$c_i$$, in the ciphertext, $$c$$, is computed as
@@ -304,7 +252,7 @@ Then modify `main` in such a way that it prints `"ciphertext: "` and then iterat
 Execute the below to evaluate the correctness of your code using `check50`. But be sure to compile and test it yourself as well!
 
 ```
-check50 cs50/problems/2022/spring/caesar
+check50 cs50/problems/2022/fall/caesar
 ```
 
 Execute the below to evaluate the style of your code using `style50`.
@@ -316,9 +264,17 @@ style50 caesar.c
 ## How to Submit
 
 1. Download your `caesar.c` file by control-clicking or right-clicking on the file in your codespace's file browser and choosing **Download**.
-1. Go to CS50's [Gradescope page](https://www.gradescope.com/courses/336119).
-1. Click "Problem Set 2: Caesar".
-1. Drag and drop your `caesar.c` file to the area that says "Drag & Drop". Be sure it has that **exact** filename! If you upload a file with a different name, the autograder likely will fail when trying to run it, and ensuring you have uploaded files with the correct filename is your responsibility!
-1. Click "Upload".
+2. Go to CS50's [Gradescope page](https://www.gradescope.com/courses/411020).
+3. Click "Problem Set 2: Caesar".
+4. Drag and drop your `caesar.c` file to the area that says "Drag & Drop". Be sure it has that **exact** filename! If you upload a file with a different name, the autograder likely will fail when trying to run it, and ensuring you have uploaded files with the correct filename is your responsibility!
+5. Click "Upload".
 
-You should see a message that says "Problem Set 2: Caesar submitted successfully!" You may not see a score just yet, but if you see the message then we've received your submission!
+You should see a message that says "Problem Set 2: Caesar submitted successfully!"
+
+{% alert danger %}
+
+Per Step 4 above, after you submit, be sure to check your autograder results. If you see `SUBMISSION ERROR: missing files (0.0/1.0)`, it means your file was not named exactly as prescribed (or you uploaded it to the wrong problem).
+
+Correctness in submissions entails everything from reading the specification, writing code that is compliant with it, and submitting files with the correct name. If you see this error, you should resubmit right away, making sure your submission is fully compliant with the specification. The staff will not adjust your filenames for you after the fact!
+
+{% endalert %}
