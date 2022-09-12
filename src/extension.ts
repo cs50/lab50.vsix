@@ -181,6 +181,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
                 };
             </script>
+            <script src="https://asciinema.org/a/14.js" id="asciicast-14" async data-size="big"></script>
             <script crossorign="anonymous" src="${mathjaxUri}"></script>
             <script src="${scriptUri}"></script>
         </html>`.trim();
