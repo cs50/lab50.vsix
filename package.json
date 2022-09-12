@@ -30,6 +30,16 @@
         "icon": "$(layout-panel-right)"
       },
       {
+        "command": "lab50.increaseFontSize",
+        "title": "Increase Font Size",
+        "icon": "$(arrow-circle-up)"
+      },
+      {
+        "command": "lab50.decreaseFontSize",
+        "title": "Decrease Font Size",
+        "icon": "$(arrow-circle-down)"
+      },
+      {
         "command": "lab50.closeLab",
         "title": "Close Lab",
         "icon": "$(panel-close)"
@@ -63,13 +73,23 @@
       ],
       "view/title": [
         {
-          "command": "lab50.resetLayout",
+          "command": "lab50.increaseFontSize",
           "group": "navigation@0",
           "when": "view == lab50"
         },
         {
-          "command": "lab50.closeLab",
+          "command": "lab50.decreaseFontSize",
           "group": "navigation@1",
+          "when": "view == lab50"
+        },
+        {
+          "command": "lab50.resetLayout",
+          "group": "navigation@2",
+          "when": "view == lab50"
+        },
+        {
+          "command": "lab50.closeLab",
+          "group": "navigation@3",
           "when": "view == lab50"
         }
       ]

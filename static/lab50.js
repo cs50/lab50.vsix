@@ -1,3 +1,5 @@
+let fontSize = 12;
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // https://stackoverflow.com/questions/56830928/calling-vscode-extension-for-data-from-webview
@@ -7,11 +9,38 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (message.command) {
             case 'reload':
                 init();
+                break;
+
+            case 'increaseFontSize':
+                increaseFontSize();
+                break;
+
+            case 'decreaseFontSize':
+                decreaseFontSize();
+                break;
         }
     });
 
     init();
 });
+
+function increaseFontSize() {
+    fontSize += 1;
+    fontSize = Math.min(fontSize, 24);
+    document.body.style.fontSize = `${fontSize}pt`;
+    document.querySelectorAll('code').forEach((each) => {
+        each.style.fontSize = `${fontSize}pt`;
+    });
+}
+
+function decreaseFontSize() {
+    fontSize -= 1;
+    fontSize = Math.max(fontSize, 6);
+    document.body.style.fontSize = `${fontSize}pt`;
+    document.querySelectorAll('code').forEach((each) => {
+        each.style.fontSize = `${fontSize}pt`;
+    });
+}
 
 function init() {
 
@@ -40,6 +69,11 @@ function init() {
         });
     } catch {}
 
+    fontSize = 12;
+    document.body.style.fontSize = `${fontSize}pt`;
+    document.querySelectorAll('code').forEach((each) => {
+        each.style.fontSize = `${fontSize}pt`;
+    });
     document.body.style.minHeight = "auto";
     window.scrollTo(0, 0);
 }

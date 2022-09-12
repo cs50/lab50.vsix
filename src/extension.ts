@@ -308,9 +308,27 @@ export async function activate(context: vscode.ExtensionContext) {
         return string.split(subString, index).join(subString).length;
     }
 
+    function increaseFontSize() {
+        webViewGlobal.webview.postMessage({ command: 'increaseFontSize'});
+    }
+
+    function decreaseFontSize() {
+        webViewGlobal.webview.postMessage({ command: 'decreaseFontSize'});
+    }
+
     // Command: Open Folder as CS50 Lab
     context.subscriptions.push(
         vscode.commands.registerCommand('lab50.openAsLab', labViewHandler)
+    );
+
+    // Command: Increase Font Size
+    context.subscriptions.push(
+        vscode.commands.registerCommand('lab50.increaseFontSize', increaseFontSize)
+    );
+
+    // Command: Decrease Font Size
+    context.subscriptions.push(
+        vscode.commands.registerCommand('lab50.decreaseFontSize', decreaseFontSize)
     );
 
     // Command: Reset Lab View
