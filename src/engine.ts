@@ -121,6 +121,37 @@ export function liquidEngine() {
         }
     });
 
+    // Register an alert tag
+    engine.registerTag('alert', {
+        parse: function(tagToken, remainTokens) {
+            this.tpls = [];
+            this.args = tagToken.args;
+
+            let closed = false;
+            while(remainTokens.length) {
+                const token = remainTokens.shift();
+
+                // we got the end tag! stop taking tokens
+                if (token.getText() === '{% endalert %}') {
+                    closed = true;
+                    break;
+                }
+
+                // parse token into template
+                // parseToken() may consume more than 1 tokens
+                // e.g. {% if %}...{% endif %}
+                const tpl = this.liquid.parser.parseToken(token, remainTokens);
+                this.tpls.push(tpl);
+            }
+            if (!closed) throw new Error(`tag ${tagToken.getText()} not closed`);
+        },
+        * render(context, emitter) {
+        emitter.write(`<div class="alert" role="alert">`);
+        yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
+        emitter.write("</div>");
+        }
+    });
+
     // Register a next tag
     engine.registerTag('next', {
         render: async function(ctx) {
