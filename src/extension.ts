@@ -8,7 +8,6 @@ import { decode } from 'html-entities';
 import { liquidEngine } from './engine';
 import { LabEditorProvider } from './editor';
 
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
@@ -20,6 +19,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let webViewGlobal : vscode.WebviewView;         // Global reference to a webview
     let currentLabFolderPath : any;                  // Current opened lab folder
+
+    // Default timeout to 10s for axios request
+    axios.defaults.timeout = 10000;
 
     // Register CS50 Lab WebView view provider
     vscode.window.registerWebviewViewProvider('lab50', {
@@ -75,6 +77,7 @@ export async function activate(context: vscode.ExtensionContext) {
             // attempt to update README.md
             if (forceUpdate && yamlConfig != undefined) {
                 if ('url' in yamlConfig) {
+
                     // attemp to download README.md file from repo
                     try {
                         const githubRawURL = yamlConfig['url'];
@@ -108,6 +111,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     } catch (error) {
                         console.log(error);
                         vscode.window.showErrorMessage(`${error}`);
+                        vscode.window.showInformationMessage(`Using local version of README.md`);
                     }
                 }
             }
@@ -197,12 +201,13 @@ export async function activate(context: vscode.ExtensionContext) {
         try {
             const yamlConfig = yaml.load(yamlFrontMatter);
 
+            // If yaml is empty or appears to be empty, render content from readme
             if (yamlConfig == null || yamlFrontMatter.length === 0) {
-                console.log("yaml config appears to be empty, render readme");
                 markdown = readmeFile;
                 return ['', markdown] as const;
             }
 
+            // If yaml is invalid (yaml front matter detected)
             if (yamlConfig == undefined || !validate(yamlConfig)) {
                 return undefined;
             }
@@ -338,10 +343,5 @@ export async function activate(context: vscode.ExtensionContext) {
         })
     );
 
-
-    await vscode.commands.executeCommand(
-        "setContext",
-        "lab50:didActivateExtension",
-        true
-      );
+    await vscode.commands.executeCommand("setContext", "lab50:didActivateExtension", true);
 }
