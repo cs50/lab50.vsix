@@ -65,18 +65,6 @@ $ ./substitution 1 2 3
 Usage: ./substitution key
 ```
 
-{% spoiler "Try It" %}
-
-To try out the staff's implementation of this problem, execute
-
-```
-./substitution key
-```
-
-substituting a valid key in place of `key`, within [this sandbox](http://bit.ly/30Gnoru).
-
-{% endspoiler %}
-
 ## Specification
 
 Design and implement a program, `substitution`, that encrypts messages using a substitution cipher.

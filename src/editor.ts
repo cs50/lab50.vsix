@@ -1,6 +1,7 @@
 
 import * as vscode from 'vscode';
 
+
 export class LabEditorProvider implements vscode.CustomTextEditorProvider {
 
     public static register(context: vscode.ExtensionContext, labViewHandler): vscode.Disposable {
@@ -17,18 +18,6 @@ export class LabEditorProvider implements vscode.CustomTextEditorProvider {
     ) { }
 
     resolveCustomTextEditor(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): void | Thenable<void> {
-        const header = "CS50 Lab";
-        const options: vscode.MessageOptions = { detail: 'Open as CS50 Lab?', modal: true };
-        vscode.window.showInformationMessage(header, options, ...["OK"]).then((item)=>{
-            if (item === 'OK') {
-                this.labViewHandler({path: document['fileName']});
-            } else {
-                try {
-                    vscode.window.showTextDocument(document);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        });
+        this.labViewHandler({path: document['fileName']});
     }
 }
