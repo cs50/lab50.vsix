@@ -3,7 +3,7 @@
   "displayName": "CS50 Lab",
   "description": "https://cs50.readthedocs.io/lab/",
   "icon": "images/lab50.png",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "publisher": "CS50",
   "repository": "https://github.com/cs50/lab50.vsix",
   "engines": {
@@ -126,6 +126,7 @@
     "luxon": "^3.0.3",
     "markdown-it": "^13.0.1",
     "markdown-it-attrs": "^4.1.4",
+    "node-html-parser": "^6.0.0",
     "pretty": "^2.0.0"
   }
 }

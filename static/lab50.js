@@ -41,19 +41,6 @@ function init() {
         });
     } catch {}
 
-    // handle Kramdown {: start="3"}
-    try {
-        document.querySelectorAll('p').forEach((each) => {
-            if (each.getAttribute('start') !== null) {
-                let start = each.getAttribute('start');
-                if (each.nextElementSibling.tagName === 'OL') {
-                    each.nextElementSibling.setAttribute('start', start);
-                    each.remove();
-                }
-            }
-        });
-    } catch {}
-
     document.body.style.minHeight = "auto";
     window.scrollTo(0, 0);
 }

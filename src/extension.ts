@@ -7,6 +7,7 @@ import markdownItAttrs = require('markdown-it-attrs');
 import { decode } from 'html-entities';
 import { liquidEngine } from './engine';
 import { LabEditorProvider } from './editor';
+import { parse } from 'node-html-parser';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -172,7 +173,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const mathjaxUri = webViewGlobal.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/mathjax/js`, 'tex-chtml.js'));
 
-        const htmlString =
+        let htmlString =
         `<!DOCTYPE html>
         <html>
             <head>
@@ -195,6 +196,34 @@ export async function activate(context: vscode.ExtensionContext) {
             <script crossorign="anonymous" src="${mathjaxUri}"></script>
             <script src="${scriptUri}"></script>
         </html>`.trim();
+
+        htmlString = postParsing(htmlString);
+
+        return htmlString;
+    }
+
+    function postParsing(htmlString) {
+
+        // handle Kramdown {: start="3"}
+        try {
+            const root = parse(htmlString);
+            root.querySelectorAll('p').forEach((each) => {
+                if (each.getAttribute('start') !== null) {
+                    const start = each.getAttribute('start');
+                    if (each.nextElementSibling === null) {
+                        return;
+                    }
+
+                    if (each.nextElementSibling.tagName === 'OL') {
+                        each.nextElementSibling.setAttribute('start', start);
+                        each.remove();
+                    }
+                }
+            });
+            htmlString = root.toString();
+        } catch (error) {
+            console.log(error);
+        }
 
         return htmlString;
     }
