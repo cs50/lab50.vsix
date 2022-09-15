@@ -133,8 +133,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
                 const md = new MarkdownIt();
                 md.use(markdownItAttrs, {
-                    leftDelimiter: "{:"
+                    leftDelimiter: "{:",
+                    rightDelimiter: "}"
                 });
+
                 const parsedHtml = md.render(parsedMarkdown);
                 const decodedHtml = decode(parsedHtml);
 
