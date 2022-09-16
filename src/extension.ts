@@ -128,28 +128,41 @@ export async function activate(context: vscode.ExtensionContext) {
             // Prepare layout
             await initWebview();
 
-            // Have liquidJS make the first pass to convert all tags to html equivalents
-            const engine = liquidEngine();
-            engine.parseAndRender(markdown).then(async parsedMarkdown => {
+            // Instantiate and configure Markdown-It instance
+            const md = new MarkdownIt({
+                html: true
+            });
+            md.use(markdownItAttrs, {
+                leftDelimiter: "{:",
+                rightDelimiter: "}"
+            });
 
-                const md = new MarkdownIt();
-                md.use(markdownItAttrs, {
-                    leftDelimiter: "{:",
-                    rightDelimiter: "}"
+            // syntax highlight
+            md.use(
+
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                require('markdown-it-highlightjs'),
+                {
+                    inline: false,
+                    auto: false
                 });
 
-                // syntax highlight
-                md.use(
+            // Parse markdown file into HTML
+            const markdownToHtml = md.render(markdown);
 
-                    // eslint-disable-next-line @typescript-eslint/no-var-requires
-                    require('markdown-it-highlightjs'),
-                    {
-                        inline: false,
-                        auto: false
-                    });
+            // Restore any Liquid.js tag
+            const htmlCleanedUp = parse(markdownToHtml);
+            htmlCleanedUp.querySelectorAll('p').forEach((each) => {
 
-                const parsedHtml = md.render(parsedMarkdown);
-                const decodedHtml = decode(parsedHtml);
+                // Does the trick for now, need to replace it with regex
+                if (each.innerHTML.includes(`{%`) && each.innerHTML.includes(`%}`)) {
+                    each.replaceWith(decode(each.innerHTML));
+                }
+            });
+
+
+            const engine = liquidEngine();
+            engine.parseAndRender(htmlCleanedUp.toString()).then(async parsedHtml => {
 
                 const scriptUri = webViewGlobal.webview.asWebviewUri(
                     vscode.Uri.joinPath(context.extension.extensionUri, STATIC_FOLDER, LAB_WEBVIEW_SCRIPT));
@@ -160,7 +173,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 const base = webViewGlobal.webview.asWebviewUri(vscode.Uri.file(configFilePath));
 
                 // Render webview
-                const html = htmlTemplate(base, scriptUri, styleUri, decodedHtml);
+                const html = htmlTemplate(base, scriptUri, styleUri, parsedHtml);
                 await prepareLayout(yamlConfig, html);
 
             });
@@ -210,8 +223,8 @@ export async function activate(context: vscode.ExtensionContext) {
             <script src="${scriptUri}"></script>
         </html>`.trim();
 
+        // Apply any customized parsing
         htmlString = postParsing(htmlString);
-
         return htmlString;
     }
 

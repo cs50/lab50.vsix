@@ -116,7 +116,7 @@ export function liquidEngine() {
 
             const clock = `<a data-clock href="https://time.cs50.io/${local}"><i class="far fa-clock" title="CS50 Time Converter"></i></a>`;
 
-            html = `<span>${html} clock: ${clock}</span>`;
+            html = `<p><span>${html} clock: ${clock}</span></p>`;
             return html;
         }
     });
@@ -146,16 +146,16 @@ export function liquidEngine() {
             if (!closed) throw new Error(`tag ${tagToken.getText()} not closed`);
         },
         * render(context, emitter) {
-        emitter.write(`<div class="alert" role="alert">`);
+        emitter.write(`<p><div class="alert" role="alert">`);
         yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
-        emitter.write("</div>");
+        emitter.write("</div></p>");
         }
     });
 
     // Register a next tag
     engine.registerTag('next', {
         render: async function(ctx) {
-            const htmlString = `<button class="btn btn-success" data-next type="button">Next</button>`;
+            const htmlString = `<p><button class="btn btn-success" data-next type="button">Next</button></p>`;
             return htmlString.trim();
         }
     });
@@ -167,7 +167,7 @@ export function liquidEngine() {
         },
         render: async function() {
             const ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url)}`;
-            const htmlString = `<div class="ratio ratio-16x9"><iframe src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe></div>`;
+            const htmlString = `<p><div class="ratio ratio-16x9"><iframe src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe></div></p>`;
             return htmlString.trim();
         }
     });
@@ -203,10 +203,10 @@ export function liquidEngine() {
             if (!closed) throw new Error(`tag ${tagToken.getText()} not closed`);
         },
         * render(context, emitter) {
-        emitter.write(`<details class='spoiler'>`);
+        emitter.write(`<p><details class='spoiler'>`);
         emitter.write(`<summary style="cursor: pointer;">${this.summary}</summary>`);
         yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
-        emitter.write("</details>");
+        emitter.write("</details></p>");
         }
     });
     return engine;
