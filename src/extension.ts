@@ -2,12 +2,12 @@ import axios from 'axios';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
-import MarkdownIt = require('markdown-it');
-import markdownItAttrs = require('markdown-it-attrs');
 import { decode } from 'html-entities';
 import { liquidEngine } from './engine';
 import { LabEditorProvider } from './editor';
 import { parse } from 'node-html-parser';
+import MarkdownIt = require('markdown-it');
+import markdownItAttrs = require('markdown-it-attrs');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -138,6 +138,16 @@ export async function activate(context: vscode.ExtensionContext) {
                     rightDelimiter: "}"
                 });
 
+                // syntax highlight
+                md.use(
+
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    require('markdown-it-highlightjs'),
+                    {
+                        inline: false,
+                        auto: false
+                    });
+
                 const parsedHtml = md.render(parsedMarkdown);
                 const decodedHtml = decode(parsedHtml);
 
@@ -181,6 +191,9 @@ export async function activate(context: vscode.ExtensionContext) {
                 <base href="${base}">
                 <link href="${fontawesomeUri}" rel="stylesheet">
                 <link href="${styleUri}" rel="stylesheet">
+                <link rel="stylesheet"
+                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
                 <script src="https://asciinema.org/a/14.js" id="asciicast-14" async data-size="big"></script>
             </head>
             <body>
