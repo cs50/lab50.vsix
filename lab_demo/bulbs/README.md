@@ -1,6 +1,5 @@
 ---
 files: [bulbs.c]
-url: https://cdn.cs50.net/2022/fall/psets/2/bulbs/README.md
 window: [terminal]
 ---
 
@@ -101,7 +100,7 @@ Your program should behave per the examples above. You can check your code using
 check50 cs50/problems/2022/fall/bulbs
 ```
 
-To evaluate that the style of your code, type in the following at the `$` prompt. 
+To evaluate that the style of your code, type in the following at the `$` prompt.
 
 ```
 style50 bulbs.c

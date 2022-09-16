@@ -1,6 +1,5 @@
 ---
 files: [readability.c]
-url: https://cdn.cs50.net/2022/fall/psets/2/readability/README.md
 window: [terminal]
 ---
 
@@ -58,15 +57,9 @@ Text: As the average number of letters and words per sentence increases, the Col
 Grade 12
 ```
 
-{% spoiler "Try It" %}
+{% spoiler "Watch a Recording" %}
 
-To try out the staff's implementation of this problem, execute
-
-```
-./readability
-```
-
-within [this sandbox](http://bit.ly/2ulEXkw).
+<script async data-autoplay="1" data-cols="100" data-loop="1" data-rows="12" id="asciicast-2YTPtsNbRP2p4bD4drEjHaoRj" src="https://asciinema.org/a/2YTPtsNbRP2p4bD4drEjHaoRj.js"></script>
 
 {% endspoiler %}
 

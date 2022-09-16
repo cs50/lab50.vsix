@@ -1,6 +1,5 @@
 ---
 files: [caesar.c]
-url: https://cdn.cs50.net/2022/fall/psets/2/caesar/README.md
 window: [terminal]
 ---
 
@@ -90,15 +89,9 @@ $ ./caesar 1 2 3
 Usage: ./caesar key
 ```
 
-{% spoiler "Try It" %}
+{% spoiler "Watch a Recording" %}
 
-To try out the staff's implementation of this problem, execute
-
-```
-./caesar key
-```
-
-within [this sandbox](http://bit.ly/2Vwi8n0), substituting a valid integer in place of `key`.
+<script async data-autoplay="1" data-cols="100" data-loop="1" data-rows="12" id="asciicast-JnlhDTjc264WfGSoNxc0hsjEY" src="https://asciinema.org/a/JnlhDTjc264WfGSoNxc0hsjEY.js"></script>
 
 {% endspoiler %}
 
