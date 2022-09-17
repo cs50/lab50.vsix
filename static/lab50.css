@@ -40,6 +40,10 @@ button.secondary:hover {
 	background: var(--vscode-button-secondaryHoverBackground);
 }
 
+h1 code {
+    color: var(--vscode-editor-foreground);
+}
+
 pre code {
     color: var(--vscode-editor-foreground);
     background: var(--vscode-editor-background);
