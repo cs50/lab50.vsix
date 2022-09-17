@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // https://stackoverflow.com/questions/56830928/calling-vscode-extension-for-data-from-webview
-
     window.addEventListener('message', event => {
         const message = event.data;
         switch (message.command) {
@@ -43,6 +42,17 @@ function init() {
 
     document.body.style.minHeight = "auto";
     window.scrollTo(0, 0);
+
+    // handle asciinema player iframe size issue
+    try {
+        setTimeout(() => {
+            document.querySelectorAll('details').forEach((each) => {
+                each.removeAttribute('open');
+            });
+        }, 1000);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 function handleNext(event) {

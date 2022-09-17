@@ -137,15 +137,11 @@ export async function activate(context: vscode.ExtensionContext) {
                 rightDelimiter: "}"
             });
 
-            // syntax highlight
-            md.use(
+            // Syntax highlight
+            const hightlightOpts = { inline: false, auto: false }
 
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                require('markdown-it-highlightjs'),
-                {
-                    inline: false,
-                    auto: false
-                });
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            md.use(require('markdown-it-highlightjs'), hightlightOpts);
 
             // Parse markdown file into HTML
             const markdownToHtml = md.render(markdown);
@@ -159,7 +155,6 @@ export async function activate(context: vscode.ExtensionContext) {
                     each.replaceWith(decode(each.innerHTML));
                 }
             });
-
 
             const engine = liquidEngine();
             engine.parseAndRender(htmlCleanedUp.toString()).then(async parsedHtml => {
@@ -191,10 +186,10 @@ export async function activate(context: vscode.ExtensionContext) {
     function htmlTemplate(base, scriptUri, styleUri, html) {
 
         const fontawesomeUri = webViewGlobal.webview.asWebviewUri(
-            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/fontawesome/css`, 'all.min.css'));
+            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/fontawesome/css/all.min.css`));
 
         const mathjaxUri = webViewGlobal.webview.asWebviewUri(
-            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/mathjax/js`, 'tex-chtml.js'));
+            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/mathjax/js/tex-chtml.js`));
 
         let htmlString =
         `<!DOCTYPE html>

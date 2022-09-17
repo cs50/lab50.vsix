@@ -203,10 +203,12 @@ export function liquidEngine() {
             if (!closed) throw new Error(`tag ${tagToken.getText()} not closed`);
         },
         * render(context, emitter) {
-        emitter.write(`<p><details class='spoiler'>`);
-        emitter.write(`<summary style="cursor: pointer;">${this.summary}</summary>`);
-        yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
-        emitter.write("</details></p>");
+
+            // Default state to "open" to address some of the iframe sizing issues (e.g., asciinema)
+            emitter.write(`<p><details class='spoiler' open>`);
+            emitter.write(`<summary style="cursor: pointer;">${this.summary}</summary>`);
+            yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
+            emitter.write("</details></p>");
         }
     });
     return engine;
