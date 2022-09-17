@@ -40,9 +40,8 @@ button.secondary:hover {
 	background: var(--vscode-button-secondaryHoverBackground);
 }
 
-code {
+pre code {
     color: var(--vscode-editor-foreground);
-    font-size: 12pt;
     background: var(--vscode-editor-background);
     white-space : pre-wrap !important;
 }
