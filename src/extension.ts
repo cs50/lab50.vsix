@@ -191,6 +191,12 @@ export async function activate(context: vscode.ExtensionContext) {
         const mathjaxUri = webViewGlobal.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/mathjax/js/tex-chtml.js`));
 
+        const highlightjsUri = webViewGlobal.webview.asWebviewUri(
+            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/highlightjs/js/11.6.0/highlight.min.js`));
+
+        const highlightStyleUri = webViewGlobal.webview.asWebviewUri(
+            vscode.Uri.joinPath(context.extension.extensionUri, `${STATIC_FOLDER}/vendor/highlightjs/css/11.6.0/styles/github-dark.min.css`));
+
         let htmlString =
         `<!DOCTYPE html>
         <html>
@@ -199,9 +205,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 <base href="${base}">
                 <link href="${fontawesomeUri}" rel="stylesheet">
                 <link href="${styleUri}" rel="stylesheet">
-                <link rel="stylesheet"
-                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark.min.css">
-                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+                <link href="${highlightStyleUri}" rel="stylesheet">
             </head>
             <body>
                 ${html}
@@ -214,6 +218,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 };
             </script>
             <script crossorign="anonymous" src="${mathjaxUri}"></script>
+            <script src="${highlightjsUri}"></script>
             <script src="${scriptUri}"></script>
         </html>`.trim();
 
