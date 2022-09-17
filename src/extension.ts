@@ -41,12 +41,12 @@ export async function activate(context: vscode.ExtensionContext) {
                 enableScripts: true,
                 localResourceRoots: [context.extension.extensionUri, workspaceFolder.uri]
             };
+            webView.webview.html = loadingSpinner();
             webViewGlobal = webView;
         }
     });
 
     context.subscriptions.push(LabEditorProvider.register(context, labViewHandler));
-
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 
@@ -253,6 +253,43 @@ export async function activate(context: vscode.ExtensionContext) {
         return htmlString;
     }
 
+    function loadingSpinner() {
+        const html =
+        `<!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                .loadingspinner {
+                    pointer-events: none;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 2.5em;
+                    height: 2.5em;
+                    margin-left: -1.25em;
+                    margin-height -1.25em;
+                    border: 0.4em solid transparent;
+                    border-color: var(--vscode-editor-background);;
+                    border-top-color: var(--vscode-editor-foreground);;
+                    border-radius: 50%;
+                    animation: loadingspin 1s linear infinite;
+                }
+
+                @keyframes loadingspin {
+                    100% {
+                            transform: rotate(360deg)
+                    }
+                }
+            </style>
+            </head>
+            <body>
+                <div class="loadingspinner"></div>
+            </body>
+        </html>`.trim();
+        return html;
+    }
+
     function extractYaml (configFilePath) {
 
         // Extract YAML front matter from README.md
@@ -316,10 +353,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
     async function prepareLayout(yamlConfig, html) {
 
-        // close all editors
+        // Focus labview
+        await vscode.commands.executeCommand('lab50.focus');
+
+        // Close all editors
         await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
-        // open files for users, if any
+        // Open files for users, if any
         if (yamlConfig != undefined && yamlConfig != '') {
             const filesToOpen = yamlConfig['files'];
             filesToOpen.forEach((file: string) => {
@@ -330,15 +370,13 @@ export async function activate(context: vscode.ExtensionContext) {
             await vscode.commands.executeCommand('workbench.action.files.newUntitledFile');
         }
 
-        // reset terminal, change working directory to lab folder
+        // Reset terminal, change working directory to lab folder
         setTimeout(async () => {
             await resetTerminal(`cd ${currentLabFolderPath} && clear`);
-        }, 500);
+        }, 200);
 
+        // Load webview
         webViewGlobal.webview.html = html;
-
-        // Focus labview
-        await vscode.commands.executeCommand('lab50.focus');
         didOpenLab = true;
     }
 
