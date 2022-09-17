@@ -206,8 +206,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 <link href="${styleUri}" rel="stylesheet">
                 <link rel="stylesheet"
                 href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
-                <script src="https://asciinema.org/a/14.js" id="asciicast-14" async data-size="big"></script>
+                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
             </head>
             <body>
                 ${html}
