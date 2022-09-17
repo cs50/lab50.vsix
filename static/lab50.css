@@ -54,7 +54,6 @@ iframe {
 
 pre {
     background: var(--vscode-editor-background);
-    padding: 10px;
 }
 
 summary {

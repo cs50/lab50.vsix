@@ -15,6 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function init() {
 
+    // handle asciinema player iframe size issue
+    try {
+        setTimeout(() => {
+            document.querySelectorAll('details').forEach((each) => {
+                each.removeAttribute('open');
+            });
+        }, 1000);
+    } catch (error) {
+        console.log(error);
+    }
+
+    // handle MathJax
+    try {
+        // override mjx-container style to inline
+        document.querySelectorAll('.MathJax').forEach((each) => {
+            each.style.display = "inline";
+        });
+    } catch {}
+
     // handle next buttons
     try {
         let nextBtns = document.querySelectorAll('[data-next]');
@@ -32,27 +51,8 @@ function init() {
         }
     } catch {}
 
-    // handle MathJax
-    try {
-        // override mjx-container style to inline
-        document.querySelectorAll('.MathJax').forEach((each) => {
-            each.style.display = "inline";
-        });
-    } catch {}
-
     document.body.style.minHeight = "auto";
     window.scrollTo(0, 0);
-
-    // handle asciinema player iframe size issue
-    try {
-        setTimeout(() => {
-            document.querySelectorAll('details').forEach((each) => {
-                each.removeAttribute('open');
-            });
-        }, 1000);
-    } catch (error) {
-        console.log(error);
-    }
 }
 
 function handleNext(event) {
