@@ -26,6 +26,9 @@ export async function activate(context: vscode.ExtensionContext) {
     const api = {
         didOpenLab() {
             return didOpenLab;
+        },
+        openLab(fileUri) {
+            labViewHandler(fileUri);
         }
       };
 
