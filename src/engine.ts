@@ -166,6 +166,12 @@ export function liquidEngine() {
             this.url = tagToken.args.replaceAll('"', "").trim();
         },
         render: async function() {
+
+            // If not on Codespace
+            if (process.env["CODESPACES"] === undefined) {
+                return `<a href="https://www.youtube.com/watch?v=${yt_parser(this.url)}">${this.url}</a>`;
+            }
+
             const ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url)}`;
             const htmlString = `<p><div class="ratio ratio-16x9"><iframe src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe></div></p>`;
             return htmlString.trim();
