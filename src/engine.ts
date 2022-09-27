@@ -169,7 +169,7 @@ export function liquidEngine() {
 
             // If not on Codespace
             if (process.env["CODESPACES"] === undefined) {
-                return `<a href="https://www.youtube.com/watch?v=${yt_parser(this.url, false)}">${this.url}</a>`;
+                return `<a href="${this.url}">${this.url}</a>`;
             }
 
             let ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url, false)}?modestbranding=0&rel=0&showinfo=1`;
