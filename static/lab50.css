@@ -56,6 +56,10 @@ iframe {
     height: 100%;
 }
 
+img {
+    background-color: #ffff;
+}
+
 pre {
     background: var(--vscode-editor-background);
 }
