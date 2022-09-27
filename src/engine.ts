@@ -169,10 +169,20 @@ export function liquidEngine() {
 
             // If not on Codespace
             if (process.env["CODESPACES"] === undefined) {
-                return `<a href="https://www.youtube.com/watch?v=${yt_parser(this.url)}">${this.url}</a>`;
+                return `<a href="https://www.youtube.com/watch?v=${yt_parser(this.url, false)}">${this.url}</a>`;
             }
 
-            const ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url)}`;
+            let ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url, false)}?modestbranding=0&rel=0&showinfo=1`;
+
+            try {
+                const plyatlistId = yt_parser(this.url, true);
+                if (plyatlistId !== undefined) {
+                    ytEmbedLink += `&list=${plyatlistId}`;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+
             const htmlString = `<p><div class="ratio ratio-16x9"><iframe src="${ytEmbedLink}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe></div></p>`;
             return htmlString.trim();
         }
@@ -221,8 +231,16 @@ export function liquidEngine() {
 }
 
 // Helper function to parse youtube id from url
-function yt_parser(url: string){
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match&&match[7].length==11)? match[7] : false;
+function yt_parser(url: string, playlist: boolean){
+    let regExp;
+    let match;
+    if (playlist) {
+        regExp = /[&?]list=([^&]+)/i;
+        match = url.match(regExp);
+        return (match && match.length > 1) ? match[1] : undefined;
+    } else {
+        regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        match = url.match(regExp);
+        return (match) ? match[7] : undefined;
+    }
 }
