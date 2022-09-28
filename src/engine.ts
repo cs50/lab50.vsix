@@ -167,17 +167,30 @@ export function liquidEngine() {
         },
         render: async function() {
 
+            // Extract YouTube video id and playlist id
+            const yt_video_id = yt_parser(this.url, false);
+            const yt_playlist_id = yt_parser(this.url, true);
+
             // If not on Codespace
             if (process.env["CODESPACES"] === undefined) {
-                return `<a href="${this.url}">${this.url}</a>`;
+                const placeholder = `
+                <div class="container">
+                    <img src="https://img.youtube.com/vi/${yt_video_id}/maxresdefault.jpg" alt="Click to play video">
+                    <div class="overlay">
+                        <a href="${this.url}" class="icon" title="Click to play video">
+                        <i class="fa fa-play"></i>
+                        </a>
+                    </div>
+                </div>
+                `;
+                return placeholder.trim();
             }
 
-            let ytEmbedLink = `https://www.youtube.com/embed/${yt_parser(this.url, false)}?modestbranding=0&rel=0&showinfo=1`;
-
+            // On Codespace
+            let ytEmbedLink = `https://www.youtube.com/embed/${yt_video_id}?modestbranding=0&rel=0&showinfo=1`;
             try {
-                const plyatlistId = yt_parser(this.url, true);
-                if (plyatlistId !== undefined) {
-                    ytEmbedLink += `&list=${plyatlistId}`;
+                if (yt_playlist_id !== undefined) {
+                    ytEmbedLink += `&list=${yt_playlist_id}`;
                 }
             } catch (error) {
                 console.log(error);
