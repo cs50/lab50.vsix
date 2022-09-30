@@ -49,7 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(LabEditorProvider.register(context, labViewHandler));
+    context.subscriptions.push(LabEditorProvider.register(labViewHandler));
 
     async function labViewHandler(fileUri: any, forceUpdate=true) {
 
