@@ -365,9 +365,9 @@ export async function activate(context: vscode.ExtensionContext) {
         // Open files for users, if any
         if (yamlConfig != undefined && yamlConfig != '') {
             const filesToOpen = yamlConfig['files'];
-            filesToOpen.forEach((file: string) => {
+            filesToOpen.forEach(async (file: string, index) => {
                 const fileURL = `${currentLabFolderPath}/${file}`;
-                vscode.window.showTextDocument(vscode.Uri.file(fileURL));
+                await vscode.window.showTextDocument(vscode.Uri.file(fileURL), { viewColumn: index + 1 });
             });
         } else {
             await vscode.commands.executeCommand('workbench.action.files.newUntitledFile');
