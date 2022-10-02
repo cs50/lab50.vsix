@@ -365,10 +365,11 @@ export async function activate(context: vscode.ExtensionContext) {
         // Open files for users, if any
         if (yamlConfig != undefined && yamlConfig != '') {
             const filesToOpen = yamlConfig['files'];
-            filesToOpen.forEach(async (file: string, index) => {
-                const fileURL = `${currentLabFolderPath}/${file}`;
-                await vscode.window.showTextDocument(vscode.Uri.file(fileURL), { viewColumn: index + 1 });
-            });
+            for (let i = 0; i < filesToOpen.length; i++) {
+                const fileURL = `${currentLabFolderPath}/${filesToOpen[i]}`;
+                const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fileURL),);
+                vscode.window.showTextDocument(doc);
+            }
         } else {
             await vscode.commands.executeCommand('workbench.action.files.newUntitledFile');
         }
