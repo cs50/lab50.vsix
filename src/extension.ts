@@ -375,9 +375,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // Reset terminal, change working directory to lab folder
-        setTimeout(async () => {
-            await resetTerminal(`cd ${currentLabFolderPath} && clear`);
-        }, 200);
+        resetTerminal(`cd ${currentLabFolderPath} && clear`);
 
         // Load webview
         webViewGlobal.webview.html = html;
@@ -385,19 +383,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     async function resetTerminal(cmd=undefined) {
-        let newTerm: vscode.Terminal;
-        if (process.env['CODESPACE']) {
-            newTerm = vscode.window.createTerminal('bash', 'bash', ['--login'],);
-        } else {
-            newTerm = vscode.window.createTerminal();
-        }
-        vscode.window.terminals.forEach((each) => {
-            if (each.processId != newTerm.processId) {
-                each.dispose();
-            }
+        vscode.window.terminals.forEach((terminal) => {
+            terminal.dispose();
         });
-        if (cmd) { newTerm.sendText(cmd); }
-        await vscode.commands.executeCommand('workbench.action.terminal.focus');
+        setTimeout(async () => {
+            await vscode.commands.executeCommand('workbench.action.terminal.focus');
+            if (cmd) { vscode.window.activeTerminal.sendText(cmd); }
+        }, 200);
     }
 
     async function initWebview() {
