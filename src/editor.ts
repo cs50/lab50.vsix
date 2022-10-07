@@ -35,7 +35,7 @@ export class LabEditorProvider implements vscode.CustomEditorProvider {
 
     resolveCustomEditor(document: vscode.CustomDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): void | Thenable<void> {
         const header = "CS50 Lab";
-        const options: vscode.MessageOptions = { detail: 'Open in CS50 Lab?', modal: true };
+        const options: vscode.MessageOptions = { detail: 'Open README.md in CS50 Lab?', modal: true };
         vscode.window.showInformationMessage(header, options, ...["Yes"]).then(async (item)=>{
             if (item === 'Yes') {
                 this.labViewHandler({path: document['uri']['path']});
