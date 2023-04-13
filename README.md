@@ -4,6 +4,6 @@
 
 ```
 npm install
-./node_modules/vsce/vsce package
-code --install-extension lab50-0.0.1.vsix
+./node_modules/@vscode/vsce/vsce package
+code --install-extension lab50-x.x.x.vsix
 ```
