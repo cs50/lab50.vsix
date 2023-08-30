@@ -94,6 +94,9 @@ int main(int argc, string argv[])
     // Print the game's result
     // TODO #7
 
+    // close file
+    fclose(wordlist);
+
     // that's all folks!
     return 0;
 }
