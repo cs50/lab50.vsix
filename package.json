@@ -3,11 +3,11 @@
   "displayName": "CS50 Lab",
   "description": "CS50 Lab for Visual Studio Code",
   "icon": "images/lab50.png",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "CS50",
   "repository": "https://github.com/cs50/lab50.vsix",
   "engines": {
-    "vscode": "^1.71.0"
+    "vscode": "^1.82.0"
   },
   "categories": [
     "Education"
@@ -111,32 +111,32 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/glob": "^7.2.0",
-    "@types/markdown-it": "^12.2.3",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "16.x",
-    "@types/vscode": "^1.71.0",
-    "@typescript-eslint/eslint-plugin": "^5.27.0",
-    "@typescript-eslint/parser": "^5.27.0",
-    "@vscode/test-electron": "^2.1.3",
-    "@vscode/vsce": "^2.19.0",
-    "eslint": "^8.16.0",
-    "glob": "^8.0.3",
-    "mocha": "^10.0.0",
-    "typescript": "^4.7.2"
+    "@types/glob": "^8.1.0",
+    "@types/markdown-it": "^13.0.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.82.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
+    "@vscode/test-electron": "^2.3.4",
+    "@vscode/vsce": "^2.21.0",
+    "eslint": "^8.50.0",
+    "glob": "^10.3.7",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@types/js-yaml": "^4.0.5",
-    "axios": "^0.27.2",
-    "highlight.js": "^11.6.0",
-    "html-entities": "^2.3.3",
+    "@types/js-yaml": "^4.0.6",
+    "axios": "^1.5.0",
+    "highlight.js": "^11.8.0",
+    "html-entities": "^2.4.0",
     "js-yaml": "^4.1.0",
-    "liquidjs": "^10.7.0",
-    "luxon": "^3.0.3",
+    "liquidjs": "^10.9.2",
+    "luxon": "^3.4.3",
     "markdown-it": "^13.0.1",
-    "markdown-it-attrs": "^4.1.4",
+    "markdown-it-attrs": "^4.1.6",
     "markdown-it-highlightjs": "^4.0.1",
-    "node-html-parser": "^6.0.0",
+    "node-html-parser": "^6.1.10",
     "pretty": "^2.0.0"
   }
 }
