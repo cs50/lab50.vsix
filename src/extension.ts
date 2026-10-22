@@ -103,7 +103,7 @@ export async function activate(context: vscode.ExtensionContext) {
                                     Accept: 'application/vnd.github.v3+json',
                                     Authorization: `token ${process.env['GITHUB_TOKEN']}`
                                 }
-                            }
+                            };
                         }
 
                         // first download the file to "README.md.download", then replace
@@ -141,9 +141,8 @@ export async function activate(context: vscode.ExtensionContext) {
             });
 
             // Syntax highlight
-            const hightlightOpts = { inline: false, auto: false }
+            const hightlightOpts = { inline: false, auto: false };
 
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
             md.use(require('markdown-it-highlightjs'), hightlightOpts);
 
             // Parse markdown file into HTML
