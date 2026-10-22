@@ -33,7 +33,7 @@ export function liquidEngine() {
                     timeZoneName: 'short',
                     weekday: 'long',
                     year: 'numeric'
-                }
+                };
 
                 html = start.toLocaleString(opts);
                 local = `${start}`;
@@ -51,7 +51,7 @@ export function liquidEngine() {
                     month: 'long',
                     weekday: 'long',
                     year: 'numeric'
-                }
+                };
 
                 const endTime = this.args[2];
                 const end = luxon.DateTime.fromISO(`${endTime}`);
@@ -59,7 +59,7 @@ export function liquidEngine() {
                     hour: 'numeric',
                     minute: 'numeric',
                     timeZoneName: 'short'
-                }
+                };
 
                 html = `${start.toLocaleString(startOpts)} - ${end.toLocaleString(endOpts)}`;
                 local = `${start}/${end}`;
@@ -82,7 +82,7 @@ export function liquidEngine() {
                     month: 'long',
                     weekday: 'long',
                     year: 'numeric'
-                }
+                };
 
                 if (locale === 'en' && (
                     start.toLocaleString(luxon.DateTime.DATE_SHORT) === end.toLocaleString(luxon.DateTime.DATE_SHORT) ||
