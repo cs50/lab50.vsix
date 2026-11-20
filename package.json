@@ -7,7 +7,7 @@
   "publisher": "CS50",
   "repository": "https://github.com/cs50/lab50.vsix",
   "engines": {
-    "vscode": "^1.140.0"
+    "vscode": "^1.144.0"
   },
   "categories": [
     "Education"
@@ -111,6 +111,8 @@
     "test": "node ./out/test/runTest.js"
   },
   "overrides": {
+    "glob": "^14.0.6",
+    "minimatch": "^11.0.1",
     "strip-ansi@^7.0.0": "7.1.2"
   },
   "devDependencies": {
@@ -118,28 +120,28 @@
     "@types/markdown-it": "^14.2.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "26.x",
-    "@types/vscode": "^1.140.0",
+    "@types/vscode": "^1.144.0",
     "@eslint/js": "^10.0.1",
     "@vscode/test-electron": "^3.1.0",
-    "@vscode/vsce": "^4.0.0",
-    "eslint": "^10.13.0",
-    "globals": "^17.13.0",
-    "glob": "^13.0.6",
+    "@vscode/vsce": "^4.1.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "glob": "^14.0.6",
     "mocha": "^12.0.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.72.0"
+    "typescript-eslint": "^8.73.0"
   },
   "dependencies": {
-    "axios": "^1.20.0",
+    "axios": "^1.21.1",
     "highlight.js": "^11.12.0",
     "html-entities": "^2.6.0",
     "js-yaml": "^5.5.0",
-    "liquidjs": "^10.30.0",
+    "liquidjs": "^10.30.1",
     "luxon": "^3.7.2",
     "markdown-it": "^14.3.3",
     "markdown-it-attrs": "^5.0.1",
     "markdown-it-highlightjs": "^4.3.0",
-    "node-html-parser": "^9.0.5",
+    "node-html-parser": "^9.0.7",
     "pretty": "^2.0.0"
   }
 }
